@@ -25,10 +25,12 @@ class ComposerStaticInit253c4afa292eab6dca564ebbab580d71
         'Vaani\\Activator' => __DIR__ . '/../..' . '/src/Activator.php',
         'Vaani\\Admin\\SettingsPage' => __DIR__ . '/../..' . '/src/Admin/SettingsPage.php',
         'Vaani\\Core\\Crypto' => __DIR__ . '/../..' . '/src/Core/Crypto.php',
+        'Vaani\\Core\\Language\\SupportedLanguages' => __DIR__ . '/../..' . '/src/Core/Language/SupportedLanguages.php',
         'Vaani\\Core\\Sarvam\\Client' => __DIR__ . '/../..' . '/src/Core/Sarvam/Client.php',
         'Vaani\\Core\\Settings' => __DIR__ . '/../..' . '/src/Core/Settings.php',
         'Vaani\\Deactivator' => __DIR__ . '/../..' . '/src/Deactivator.php',
         'Vaani\\Plugin' => __DIR__ . '/../..' . '/src/Plugin.php',
+        'Vaani\\Translation\\Admin\\LanguagePanel' => __DIR__ . '/../..' . '/src/Translation/Admin/LanguagePanel.php',
     );
 
     public static function getInitializer(ClassLoader $loader)

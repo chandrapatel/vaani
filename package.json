@@ -9,7 +9,8 @@
 	},
 	"10up-toolkit": {
 		"entry": {
-			"admin-settings": "assets/js/admin-settings.js"
+			"admin-settings": "assets/js/admin-settings.js",
+			"editor-language-panel": "assets/js/editor-language-panel.js"
 		}
 	},
 	"scripts": {

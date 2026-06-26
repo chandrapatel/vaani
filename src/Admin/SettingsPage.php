@@ -9,6 +9,7 @@ declare( strict_types=1 );
 
 namespace Vaani\Admin;
 
+use Vaani\Core\Language\SupportedLanguages;
 use Vaani\Core\Sarvam\Client;
 use Vaani\Core\Settings;
 
@@ -111,6 +112,14 @@ class SettingsPage {
 		);
 
 		add_settings_field(
+			'target_langs',
+			__( 'Target languages', 'vaani' ),
+			array( $this, 'render_target_langs_field' ),
+			self::PAGE_SLUG,
+			'vaani_main'
+		);
+
+		add_settings_field(
 			'post_types',
 			__( 'Translatable content', 'vaani' ),
 			array( $this, 'render_post_types_field' ),
@@ -161,6 +170,28 @@ class SettingsPage {
 			);
 		}
 		echo '</select>';
+	}
+
+	/**
+	 * Render the enabled target-languages checkboxes.
+	 *
+	 * These are the languages offered per post/page in the editor sidebar.
+	 */
+	public function render_target_langs_field(): void {
+		$enabled = $this->settings->get_target_langs();
+
+		echo '<fieldset>';
+		foreach ( SupportedLanguages::all() as $code => $label ) {
+			printf(
+				'<label style="display:block;margin-bottom:4px;"><input type="checkbox" name="%1$s[target_langs][]" value="%2$s" %3$s /> %4$s</label>',
+				esc_attr( Settings::OPTION_NAME ),
+				esc_attr( $code ),
+				checked( in_array( $code, $enabled, true ), true, false ),
+				esc_html( $label )
+			);
+		}
+		echo '</fieldset>';
+		echo '<p class="description">' . esc_html__( 'Languages enabled here appear as per-post options in the editor.', 'vaani' ) . '</p>';
 	}
 
 	/**

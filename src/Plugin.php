@@ -12,6 +12,7 @@ namespace Vaani;
 use Vaani\Admin\SettingsPage;
 use Vaani\Core\Crypto;
 use Vaani\Core\Settings;
+use Vaani\Translation\Admin\LanguagePanel;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -29,6 +30,7 @@ class Plugin {
 		$settings = new Settings( new Crypto() );
 
 		( new SettingsPage( $settings ) )->register();
+		( new LanguagePanel( $settings ) )->register();
 	}
 
 	/**

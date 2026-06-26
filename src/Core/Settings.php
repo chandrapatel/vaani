@@ -9,6 +9,8 @@ declare( strict_types=1 );
 
 namespace Vaani\Core;
 
+use Vaani\Core\Language\SupportedLanguages;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -43,9 +45,10 @@ class Settings {
 	 */
 	public static function defaults(): array {
 		return array(
-			'api_key'     => '',
-			'source_lang' => 'en',
-			'post_types'  => array( 'post' ),
+			'api_key'      => '',
+			'source_lang'  => 'en',
+			'post_types'   => array( 'post' ),
+			'target_langs' => array(),
 		);
 	}
 
@@ -93,6 +96,17 @@ class Settings {
 	}
 
 	/**
+	 * Globally enabled target languages, as supported language codes.
+	 *
+	 * @return string[]
+	 */
+	public function get_target_langs(): array {
+		$langs = $this->all()['target_langs'];
+
+		return is_array( $langs ) ? array_values( $langs ) : array();
+	}
+
+	/**
 	 * Sanitize callback for the Settings API.
 	 *
 	 * @param mixed $input Raw submitted value.
@@ -110,10 +124,15 @@ class Settings {
 			? array_values( array_intersect( self::ALLOWED_POST_TYPES, array_map( 'sanitize_key', $input['post_types'] ) ) )
 			: array();
 
+		$target_langs = isset( $input['target_langs'] ) && is_array( $input['target_langs'] )
+			? array_values( array_intersect( SupportedLanguages::codes(), array_map( 'sanitize_key', $input['target_langs'] ) ) )
+			: array();
+
 		return array(
-			'api_key'     => $api_key,
-			'source_lang' => $source_lang,
-			'post_types'  => $post_types,
+			'api_key'      => $api_key,
+			'source_lang'  => $source_lang,
+			'post_types'   => $post_types,
+			'target_langs' => $target_langs,
 		);
 	}
 

@@ -10,8 +10,10 @@ return array(
     'Vaani\\Activator' => $baseDir . '/src/Activator.php',
     'Vaani\\Admin\\SettingsPage' => $baseDir . '/src/Admin/SettingsPage.php',
     'Vaani\\Core\\Crypto' => $baseDir . '/src/Core/Crypto.php',
+    'Vaani\\Core\\Language\\SupportedLanguages' => $baseDir . '/src/Core/Language/SupportedLanguages.php',
     'Vaani\\Core\\Sarvam\\Client' => $baseDir . '/src/Core/Sarvam/Client.php',
     'Vaani\\Core\\Settings' => $baseDir . '/src/Core/Settings.php',
     'Vaani\\Deactivator' => $baseDir . '/src/Deactivator.php',
     'Vaani\\Plugin' => $baseDir . '/src/Plugin.php',
+    'Vaani\\Translation\\Admin\\LanguagePanel' => $baseDir . '/src/Translation/Admin/LanguagePanel.php',
 );
