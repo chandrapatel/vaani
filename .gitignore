@@ -29,6 +29,9 @@ wp-config.php
 # Uploads
 /wp-content/uploads/
 
+# Node dependencies (vendor/ and dist/ ARE committed — they ship in the zip)
+/node_modules/
+
 # Log files
 *.log
 

@@ -1,0 +1,30 @@
+{
+	"name": "vaani",
+	"version": "1.0.0",
+	"description": "AI Translation & Audio for Indian Blogs.",
+	"license": "GPL-2.0-or-later",
+	"private": true,
+	"engines": {
+		"node": ">=24"
+	},
+	"10up-toolkit": {
+		"entry": {
+			"admin-settings": "assets/js/admin-settings.js"
+		}
+	},
+	"scripts": {
+		"build": "10up-toolkit build",
+		"start": "10up-toolkit build --watch",
+		"lint-js": "10up-toolkit lint-js",
+		"format-js": "10up-toolkit format-js",
+		"lint-style": "10up-toolkit lint-style"
+	},
+	"devDependencies": {
+		"10up-toolkit": "^6.5.1",
+		"prettier": "3.3.3",
+		"terser-webpack-plugin": "^5.6.1"
+	},
+	"overrides": {
+		"webpackbar": "^7.0.0"
+	}
+}

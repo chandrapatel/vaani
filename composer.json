@@ -1,0 +1,17 @@
+{
+	"name": "chandrapatel/vaani",
+	"description": "Translate posts and pages into Indian languages and generate per-language audio using Sarvam AI.",
+	"type": "wordpress-plugin",
+	"license": "GPL-2.0-or-later",
+	"require": {
+		"php": ">=8.0"
+	},
+	"autoload": {
+		"psr-4": {
+			"Vaani\\": "src/"
+		}
+	},
+	"config": {
+		"optimize-autoloader": true
+	}
+}
