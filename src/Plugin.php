@@ -11,8 +11,13 @@ namespace Vaani;
 
 use Vaani\Admin\SettingsPage;
 use Vaani\Core\Crypto;
+use Vaani\Core\Queue;
 use Vaani\Core\Settings;
 use Vaani\Translation\Admin\LanguagePanel;
+use Vaani\Translation\Admin\TranslationMetaBox;
+use Vaani\Translation\TranslationPostType;
+use Vaani\Translation\TranslationRepository;
+use Vaani\Translation\TranslationService;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -31,6 +36,15 @@ class Plugin {
 
 		( new SettingsPage( $settings ) )->register();
 		( new LanguagePanel( $settings ) )->register();
+
+		// Translation engine (Phase 2).
+		( new TranslationPostType() )->register();
+
+		$repository = new TranslationRepository();
+		$service    = new TranslationService( $repository, new Queue(), $settings );
+		$service->register();
+
+		( new TranslationMetaBox( $settings, $repository, $service ) )->register();
 	}
 
 	/**

@@ -126,6 +126,46 @@ class SettingsPage {
 			self::PAGE_SLUG,
 			'vaani_main'
 		);
+
+		add_settings_section(
+			'vaani_translation',
+			__( 'Translation', 'vaani' ),
+			'__return_false',
+			self::PAGE_SLUG
+		);
+
+		add_settings_field(
+			'translate_model',
+			__( 'Model', 'vaani' ),
+			array( $this, 'render_translate_model_field' ),
+			self::PAGE_SLUG,
+			'vaani_translation',
+			array( 'label_for' => 'vaani_translate_model' )
+		);
+
+		add_settings_field(
+			'translate_mode',
+			__( 'Tone', 'vaani' ),
+			array( $this, 'render_translate_mode_field' ),
+			self::PAGE_SLUG,
+			'vaani_translation',
+			array(
+				'label_for' => 'vaani_translate_mode',
+				'class'     => 'vaani-row-mayura',
+			)
+		);
+
+		add_settings_field(
+			'translate_gender',
+			__( 'Speaker gender', 'vaani' ),
+			array( $this, 'render_translate_gender_field' ),
+			self::PAGE_SLUG,
+			'vaani_translation',
+			array(
+				'label_for' => 'vaani_translate_gender',
+				'class'     => 'vaani-row-mayura',
+			)
+		);
 	}
 
 	/**
@@ -215,6 +255,76 @@ class SettingsPage {
 			);
 		}
 		echo '</fieldset>';
+	}
+
+	/**
+	 * Render the translation-model select.
+	 */
+	public function render_translate_model_field(): void {
+		$current = $this->settings->get_translate_model();
+		$labels  = array(
+			'mayura:v1'           => __( 'Mayura — tone & gender control, up to 1000 chars/request', 'vaani' ),
+			'sarvam-translate:v1' => __( 'Sarvam Translate — formal only, up to 2000 chars/request', 'vaani' ),
+		);
+
+		printf( '<select id="vaani_translate_model" name="%s[translate_model]">', esc_attr( Settings::OPTION_NAME ) );
+		foreach ( Client::TRANSLATE_MODELS as $model => $caps ) {
+			printf(
+				'<option value="%1$s" %2$s>%3$s</option>',
+				esc_attr( $model ),
+				selected( $current, $model, false ),
+				esc_html( $labels[ $model ] ?? $model )
+			);
+		}
+		echo '</select>';
+		echo '<p class="description">' . esc_html__( 'Tone and speaker gender apply to Mayura only.', 'vaani' ) . '</p>';
+	}
+
+	/**
+	 * Render the translation tone-mode select (Mayura only).
+	 */
+	public function render_translate_mode_field(): void {
+		$current = $this->settings->get_translate_mode();
+		$labels  = array(
+			'formal'             => __( 'Formal', 'vaani' ),
+			'modern-colloquial'  => __( 'Modern colloquial', 'vaani' ),
+			'classic-colloquial' => __( 'Classic colloquial', 'vaani' ),
+			'code-mixed'         => __( 'Code-mixed', 'vaani' ),
+		);
+
+		printf( '<select id="vaani_translate_mode" name="%s[translate_mode]">', esc_attr( Settings::OPTION_NAME ) );
+		foreach ( Client::TRANSLATE_MODES as $mode ) {
+			printf(
+				'<option value="%1$s" %2$s>%3$s</option>',
+				esc_attr( $mode ),
+				selected( $current, $mode, false ),
+				esc_html( $labels[ $mode ] ?? $mode )
+			);
+		}
+		echo '</select>';
+	}
+
+	/**
+	 * Render the speaker-gender select (Mayura only).
+	 */
+	public function render_translate_gender_field(): void {
+		$current = $this->settings->get_translate_gender();
+		$labels  = array(
+			'Male'   => __( 'Male', 'vaani' ),
+			'Female' => __( 'Female', 'vaani' ),
+		);
+
+		printf( '<select id="vaani_translate_gender" name="%s[translate_gender]">', esc_attr( Settings::OPTION_NAME ) );
+		foreach ( Client::SPEAKER_GENDERS as $gender ) {
+			printf(
+				'<option value="%1$s" %2$s>%3$s</option>',
+				esc_attr( $gender ),
+				selected( $current, $gender, false ),
+				esc_html( $labels[ $gender ] ?? $gender )
+			);
+		}
+		echo '</select>';
+		echo '<p class="description">' . esc_html__( 'Helps keep first-person verb forms consistent across the translation.', 'vaani' ) . '</p>';
 	}
 
 	/**

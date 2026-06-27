@@ -8,6 +8,21 @@ document.addEventListener( 'DOMContentLoaded', () => {
 	const button = document.getElementById( 'vaani-test-connection' );
 	const result = document.getElementById( 'vaani-test-connection-result' );
 
+	// Show Mayura-only translation settings (tone, gender) only when Mayura is
+	// the selected model; Sarvam Translate supports neither.
+	const modelSelect = document.getElementById( 'vaani_translate_model' );
+	if ( modelSelect ) {
+		const mayuraRows = document.querySelectorAll( '.vaani-row-mayura' );
+		const syncRows = () => {
+			const isMayura = modelSelect.value === 'mayura:v1';
+			mayuraRows.forEach( ( row ) => {
+				row.style.display = isMayura ? '' : 'none';
+			} );
+		};
+		modelSelect.addEventListener( 'change', syncRows );
+		syncRows();
+	}
+
 	if ( ! config || ! button || ! result ) {
 		return;
 	}

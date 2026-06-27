@@ -25,12 +25,22 @@ class ComposerStaticInit253c4afa292eab6dca564ebbab580d71
         'Vaani\\Activator' => __DIR__ . '/../..' . '/src/Activator.php',
         'Vaani\\Admin\\SettingsPage' => __DIR__ . '/../..' . '/src/Admin/SettingsPage.php',
         'Vaani\\Core\\Crypto' => __DIR__ . '/../..' . '/src/Core/Crypto.php',
+        'Vaani\\Core\\Hash' => __DIR__ . '/../..' . '/src/Core/Hash.php',
+        'Vaani\\Core\\Language\\Language' => __DIR__ . '/../..' . '/src/Core/Language/Language.php',
+        'Vaani\\Core\\Language\\Registry' => __DIR__ . '/../..' . '/src/Core/Language/Registry.php',
         'Vaani\\Core\\Language\\SupportedLanguages' => __DIR__ . '/../..' . '/src/Core/Language/SupportedLanguages.php',
+        'Vaani\\Core\\Queue' => __DIR__ . '/../..' . '/src/Core/Queue.php',
         'Vaani\\Core\\Sarvam\\Client' => __DIR__ . '/../..' . '/src/Core/Sarvam/Client.php',
+        'Vaani\\Core\\Sarvam\\Response' => __DIR__ . '/../..' . '/src/Core/Sarvam/Response.php',
         'Vaani\\Core\\Settings' => __DIR__ . '/../..' . '/src/Core/Settings.php',
         'Vaani\\Deactivator' => __DIR__ . '/../..' . '/src/Deactivator.php',
         'Vaani\\Plugin' => __DIR__ . '/../..' . '/src/Plugin.php',
         'Vaani\\Translation\\Admin\\LanguagePanel' => __DIR__ . '/../..' . '/src/Translation/Admin/LanguagePanel.php',
+        'Vaani\\Translation\\Admin\\TranslationMetaBox' => __DIR__ . '/../..' . '/src/Translation/Admin/TranslationMetaBox.php',
+        'Vaani\\Translation\\BlockTranslator' => __DIR__ . '/../..' . '/src/Translation/BlockTranslator.php',
+        'Vaani\\Translation\\TranslationPostType' => __DIR__ . '/../..' . '/src/Translation/TranslationPostType.php',
+        'Vaani\\Translation\\TranslationRepository' => __DIR__ . '/../..' . '/src/Translation/TranslationRepository.php',
+        'Vaani\\Translation\\TranslationService' => __DIR__ . '/../..' . '/src/Translation/TranslationService.php',
     );
 
     public static function getInitializer(ClassLoader $loader)

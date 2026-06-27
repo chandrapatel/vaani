@@ -10,6 +10,7 @@ declare( strict_types=1 );
 namespace Vaani\Core;
 
 use Vaani\Core\Language\SupportedLanguages;
+use Vaani\Core\Sarvam\Client;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -45,10 +46,13 @@ class Settings {
 	 */
 	public static function defaults(): array {
 		return array(
-			'api_key'      => '',
-			'source_lang'  => 'en',
-			'post_types'   => array( 'post' ),
-			'target_langs' => array(),
+			'api_key'          => '',
+			'source_lang'      => 'en',
+			'post_types'       => array( 'post' ),
+			'target_langs'     => array(),
+			'translate_model'  => Client::DEFAULT_MODEL,
+			'translate_mode'   => 'formal',
+			'translate_gender' => 'Male',
 		);
 	}
 
@@ -107,6 +111,42 @@ class Settings {
 	}
 
 	/**
+	 * Selected translation model (e.g. `mayura:v1`).
+	 */
+	public function get_translate_model(): string {
+		$model = (string) $this->all()['translate_model'];
+
+		return isset( Client::TRANSLATE_MODELS[ $model ] ) ? $model : Client::DEFAULT_MODEL;
+	}
+
+	/**
+	 * Selected translation tone mode (e.g. `formal`).
+	 */
+	public function get_translate_mode(): string {
+		return (string) $this->all()['translate_mode'];
+	}
+
+	/**
+	 * Selected speaker gender (`Male`/`Female`).
+	 */
+	public function get_translate_gender(): string {
+		return (string) $this->all()['translate_gender'];
+	}
+
+	/**
+	 * Translation config for {@see Client}, with model-appropriate values.
+	 *
+	 * @return array<string, string>
+	 */
+	public function get_translation_config(): array {
+		return array(
+			'model'          => $this->get_translate_model(),
+			'mode'           => $this->get_translate_mode(),
+			'speaker_gender' => $this->get_translate_gender(),
+		);
+	}
+
+	/**
 	 * Sanitize callback for the Settings API.
 	 *
 	 * @param mixed $input Raw submitted value.
@@ -128,11 +168,23 @@ class Settings {
 			? array_values( array_intersect( SupportedLanguages::codes(), array_map( 'sanitize_key', $input['target_langs'] ) ) )
 			: array();
 
+		$model = isset( $input['translate_model'] ) ? sanitize_text_field( (string) $input['translate_model'] ) : $defaults['translate_model'];
+		$model = isset( Client::TRANSLATE_MODELS[ $model ] ) ? $model : $defaults['translate_model'];
+
+		$mode = isset( $input['translate_mode'] ) ? sanitize_text_field( (string) $input['translate_mode'] ) : $defaults['translate_mode'];
+		$mode = in_array( $mode, Client::TRANSLATE_MODES, true ) ? $mode : $defaults['translate_mode'];
+
+		$gender = isset( $input['translate_gender'] ) ? sanitize_text_field( (string) $input['translate_gender'] ) : $defaults['translate_gender'];
+		$gender = in_array( $gender, Client::SPEAKER_GENDERS, true ) ? $gender : $defaults['translate_gender'];
+
 		return array(
-			'api_key'      => $api_key,
-			'source_lang'  => $source_lang,
-			'post_types'   => $post_types,
-			'target_langs' => $target_langs,
+			'api_key'          => $api_key,
+			'source_lang'      => $source_lang,
+			'post_types'       => $post_types,
+			'target_langs'     => $target_langs,
+			'translate_model'  => $model,
+			'translate_mode'   => $mode,
+			'translate_gender' => $gender,
 		);
 	}
 
