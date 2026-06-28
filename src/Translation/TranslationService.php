@@ -144,12 +144,12 @@ class TranslationService {
 			 * The `wp_vaani_usage` table and its listener are built in Phase 5;
 			 * this is the forward-declared seam (CLAUDE.md §6 Phase 2, seam #4).
 			 *
-			 * @param string $operation Operation name (e.g. 'translate').
+			 * @param string $operation Operation name ('translate' or 'transliterate').
 			 * @param string $lang      Target language code.
 			 * @param int    $units     Billable units (characters) consumed.
 			 * @param int    $source_id Source post ID.
 			 */
-			do_action( 'vaani_usage_logged', 'translate', $lang, mb_strlen( $source->post_content ), $source_id );
+			do_action( 'vaani_usage_logged', $this->settings->get_translation_method(), $lang, mb_strlen( $source->post_content ), $source_id );
 		} catch ( Throwable $e ) {
 			$existing = $this->repository->find( $source_id, $lang );
 			if ( $existing ) {

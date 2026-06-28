@@ -485,7 +485,75 @@ class BlockTranslator {
 			}
 		}
 
+		$translated = $this->restore_token_spacing(
+			(string) $fragment['masked'],
+			$translated,
+			array_keys( $fragment['tokens'] )
+		);
+
 		$this->fragments[ $id ]['result'] = $this->unmask( $translated, $fragment['tokens'] );
+	}
+
+	/**
+	 * Re-insert whitespace around tag tokens that the model dropped.
+	 *
+	 * The model treats the Private-Use token code points as letters, so it tends
+	 * to swallow a space sitting immediately before or after an inline tag (e.g.
+	 * `word <em>x</em> word` collapses to `word<em>x</em>word`). Each token is
+	 * unique and appears exactly once in both strings, so we compare every
+	 * token's neighbours in the original and restore a single space wherever the
+	 * translation lost one. Only missing spaces are added; existing spacing is
+	 * left untouched.
+	 *
+	 * @param string   $original   Original masked string.
+	 * @param string   $translated Translated masked string.
+	 * @param string[] $tokens     Token code points present in the fragment.
+	 */
+	private function restore_token_spacing( string $original, string $translated, array $tokens ): string {
+		foreach ( $tokens as $token ) {
+			$token    = (string) $token;
+			$orig_pos = mb_strpos( $original, $token );
+
+			if ( false === $orig_pos ) {
+				continue;
+			}
+
+			$token_len    = mb_strlen( $token );
+			$space_before = $orig_pos > 0 && $this->is_space( mb_substr( $original, $orig_pos - 1, 1 ) );
+			$after_pos    = $orig_pos + $token_len;
+			$space_after  = $after_pos < mb_strlen( $original ) && $this->is_space( mb_substr( $original, $after_pos, 1 ) );
+
+			if ( ! $space_before && ! $space_after ) {
+				continue;
+			}
+
+			$pos = mb_strpos( $translated, $token );
+			if ( false === $pos ) {
+				continue;
+			}
+
+			// Restore the trailing space first so the token's own start position
+			// (used for the leading space) stays valid.
+			if ( $space_after ) {
+				$next = $pos + $token_len;
+				if ( $next >= mb_strlen( $translated ) || ! $this->is_space( mb_substr( $translated, $next, 1 ) ) ) {
+					$translated = mb_substr( $translated, 0, $next ) . ' ' . mb_substr( $translated, $next );
+				}
+			}
+
+			if ( $space_before && ( 0 === $pos || ! $this->is_space( mb_substr( $translated, $pos - 1, 1 ) ) ) ) {
+				$translated = mb_substr( $translated, 0, $pos ) . ' ' . mb_substr( $translated, $pos );
+			}
+		}
+
+		return $translated;
+	}
+
+	/**
+	 * Whether a single character is whitespace.
+	 */
+	private function is_space( string $char ): bool {
+		return '' !== $char && '' === trim( $char );
 	}
 
 	/**
@@ -516,7 +584,7 @@ class BlockTranslator {
 	 * @throws RuntimeException When the API call fails.
 	 */
 	private function client_translate( string $text ): string {
-		$response = $this->client->translate_text( $text, $this->source, $this->target );
+		$response = $this->client->convert( $text, $this->source, $this->target );
 
 		if ( ! $response->ok() ) {
 			throw new RuntimeException( esc_html( $response->error() ) );
@@ -540,7 +608,11 @@ class BlockTranslator {
 			return $this->plain_memo[ $text ];
 		}
 
-		$result = $this->translate_one( $text );
+		// Translate the trimmed core and re-attach the original surrounding
+		// whitespace, which the API would otherwise strip — losing the space
+		// between adjacent inline nodes (e.g. ` <em>foo</em> `).
+		preg_match( '/^(\s*)(.*?)(\s*)$/su', $text, $matches );
+		$result = $matches[1] . $this->translate_one( $matches[2] ) . $matches[3];
 
 		$this->plain_memo[ $text ] = $result;
 

@@ -50,9 +50,13 @@ class Settings {
 			'source_lang'      => 'en',
 			'post_types'       => array( 'post' ),
 			'target_langs'     => array(),
-			'translate_model'  => Client::DEFAULT_MODEL,
-			'translate_mode'   => 'formal',
-			'translate_gender' => 'Male',
+			'translation_method'            => Client::METHOD_TRANSLATE,
+			'translate_model'               => Client::DEFAULT_MODEL,
+			'translate_mode'                => 'formal',
+			'translate_gender'              => 'Male',
+			'transliterate_numerals_format' => 'native',
+			'transliterate_spoken_form'     => false,
+			'transliterate_spoken_numerals' => 'native',
 			'audio_model'      => Client::DEFAULT_TTS_MODEL,
 			'audio_speaker'    => '',
 			'audio_pace'       => 1.0,
@@ -114,6 +118,40 @@ class Settings {
 	}
 
 	/**
+	 * Selected conversion method (`translate` or `transliterate`).
+	 */
+	public function get_translation_method(): string {
+		$method = (string) $this->all()['translation_method'];
+
+		return in_array( $method, Client::METHODS, true ) ? $method : Client::METHOD_TRANSLATE;
+	}
+
+	/**
+	 * Selected transliteration numeral format (`international`/`native`).
+	 */
+	public function get_transliterate_numerals_format(): string {
+		$format = (string) $this->all()['transliterate_numerals_format'];
+
+		return in_array( $format, Client::NUMERALS_FORMATS, true ) ? $format : 'native';
+	}
+
+	/**
+	 * Whether transliteration converts text to a natural spoken form.
+	 */
+	public function get_transliterate_spoken_form(): bool {
+		return (bool) $this->all()['transliterate_spoken_form'];
+	}
+
+	/**
+	 * Language for spoken-form numerals (`english`/`native`).
+	 */
+	public function get_transliterate_spoken_numerals(): string {
+		$lang = (string) $this->all()['transliterate_spoken_numerals'];
+
+		return in_array( $lang, Client::SPOKEN_FORM_NUMERAL_LANGS, true ) ? $lang : 'native';
+	}
+
+	/**
 	 * Selected translation model (e.g. `mayura:v1`).
 	 */
 	public function get_translate_model(): string {
@@ -139,13 +177,17 @@ class Settings {
 	/**
 	 * Translation config for {@see Client}, with model-appropriate values.
 	 *
-	 * @return array<string, string>
+	 * @return array<string, mixed>
 	 */
 	public function get_translation_config(): array {
 		return array(
-			'model'          => $this->get_translate_model(),
-			'mode'           => $this->get_translate_mode(),
-			'speaker_gender' => $this->get_translate_gender(),
+			'method'                        => $this->get_translation_method(),
+			'model'                         => $this->get_translate_model(),
+			'mode'                          => $this->get_translate_mode(),
+			'speaker_gender'                => $this->get_translate_gender(),
+			'numerals_format'               => $this->get_transliterate_numerals_format(),
+			'spoken_form'                   => $this->get_transliterate_spoken_form(),
+			'spoken_form_numerals_language' => $this->get_transliterate_spoken_numerals(),
 		);
 	}
 
@@ -207,6 +249,17 @@ class Settings {
 			? array_values( array_intersect( SupportedLanguages::codes(), array_map( 'sanitize_key', $input['target_langs'] ) ) )
 			: array();
 
+		$method = isset( $input['translation_method'] ) ? sanitize_text_field( (string) $input['translation_method'] ) : $defaults['translation_method'];
+		$method = in_array( $method, Client::METHODS, true ) ? $method : $defaults['translation_method'];
+
+		$numerals_format = isset( $input['transliterate_numerals_format'] ) ? sanitize_text_field( (string) $input['transliterate_numerals_format'] ) : $defaults['transliterate_numerals_format'];
+		$numerals_format = in_array( $numerals_format, Client::NUMERALS_FORMATS, true ) ? $numerals_format : $defaults['transliterate_numerals_format'];
+
+		$spoken_form = ! empty( $input['transliterate_spoken_form'] );
+
+		$spoken_numerals = isset( $input['transliterate_spoken_numerals'] ) ? sanitize_text_field( (string) $input['transliterate_spoken_numerals'] ) : $defaults['transliterate_spoken_numerals'];
+		$spoken_numerals = in_array( $spoken_numerals, Client::SPOKEN_FORM_NUMERAL_LANGS, true ) ? $spoken_numerals : $defaults['transliterate_spoken_numerals'];
+
 		$model = isset( $input['translate_model'] ) ? sanitize_text_field( (string) $input['translate_model'] ) : $defaults['translate_model'];
 		$model = isset( Client::TRANSLATE_MODELS[ $model ] ) ? $model : $defaults['translate_model'];
 
@@ -226,16 +279,20 @@ class Settings {
 		$audio_pace = max( 0.5, min( 2.0, $audio_pace ) );
 
 		return array(
-			'api_key'          => $api_key,
-			'source_lang'      => $source_lang,
-			'post_types'       => $post_types,
-			'target_langs'     => $target_langs,
-			'translate_model'  => $model,
-			'translate_mode'   => $mode,
-			'translate_gender' => $gender,
-			'audio_model'      => $audio_model,
-			'audio_speaker'    => $audio_speaker,
-			'audio_pace'       => $audio_pace,
+			'api_key'                       => $api_key,
+			'source_lang'                   => $source_lang,
+			'post_types'                    => $post_types,
+			'target_langs'                  => $target_langs,
+			'translation_method'            => $method,
+			'translate_model'               => $model,
+			'translate_mode'                => $mode,
+			'translate_gender'              => $gender,
+			'transliterate_numerals_format' => $numerals_format,
+			'transliterate_spoken_form'     => $spoken_form,
+			'transliterate_spoken_numerals' => $spoken_numerals,
+			'audio_model'                   => $audio_model,
+			'audio_speaker'                 => $audio_speaker,
+			'audio_pace'                    => $audio_pace,
 		);
 	}
 

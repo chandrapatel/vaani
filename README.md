@@ -31,13 +31,18 @@ The distributed zip is self-contained — `vendor/` (Composer + Action Scheduler
 
 1. **Enable languages** — in *Settings → Vaani*, choose the target languages to offer and which
    post types are translatable (posts on by default, pages opt-in).
-2. **Choose a translation model** — *Settings → Vaani → Translation*:
-   - **Mayura** — supports translation **tone** (formal / colloquial / code-mixed) and
-     **speaker gender**; up to 1000 characters per request.
-   - **Sarvam Translate** — formal tone only, no gender control; up to 2000 characters per
-     request and more languages.
+2. **Choose a method** — *Settings → Vaani → Translation*:
+   - **Translation** — converts *meaning* into the target language. Pick a model:
+     - **Mayura** — supports translation **tone** (formal / colloquial / code-mixed) and
+       **speaker gender**; up to 1000 characters per request.
+     - **Sarvam Translate** — formal tone only, **speaker gender** supported; up to 2000
+       characters per request and more languages.
 
-   Tone and speaker gender apply to Mayura only and are hidden when Sarvam Translate is selected.
+     Speaker gender applies to both models; tone applies to Mayura only.
+   - **Transliteration** — converts *script*, not meaning: the original words are written in
+     the target script, spelled phonetically (e.g. English → Devanagari). Useful for technical
+     posts with English terms that have no native equivalent. Options: **numerals**
+     (international `0-9` vs native script) and an optional **spoken form**.
 3. **Pick languages per post** — in the block editor, use the **Translate into** panel to tick
    which enabled languages this post should be translated into.
 4. **Translate** — in the **Vaani Translations** meta box, click **Translate now** for a
@@ -49,8 +54,8 @@ The distributed zip is self-contained — `vendor/` (Composer + Action Scheduler
    revision history is preserved). When you edit the English source, its translations show a
    **(stale)** badge until re-translated.
 
-Settings changes (model/tone/gender) apply to the *next* translation; existing translations are
-not auto-regenerated.
+Settings changes (method/model/tone/gender) apply to the *next* translation; existing
+translations are not auto-regenerated.
 
 ## What gets translated
 

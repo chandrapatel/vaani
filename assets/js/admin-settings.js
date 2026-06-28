@@ -8,18 +8,42 @@ document.addEventListener( 'DOMContentLoaded', () => {
 	const button = document.getElementById( 'vaani-test-connection' );
 	const result = document.getElementById( 'vaani-test-connection-result' );
 
-	// Show Mayura-only translation settings (tone, gender) only when Mayura is
-	// the selected model; Sarvam Translate supports neither.
+	// Show translation- vs transliteration-specific settings based on the chosen
+	// method, and within translation show the Mayura-only Tone row only when
+	// Mayura is the selected model; Sarvam Translate supports formal tone only.
+	const methodSelect = document.getElementById( 'vaani_translation_method' );
 	const modelSelect = document.getElementById( 'vaani_translate_model' );
-	if ( modelSelect ) {
+	if ( methodSelect || modelSelect ) {
+		const translateRows = document.querySelectorAll( '.vaani-row-translate' );
+		const transliterateRows = document.querySelectorAll( '.vaani-row-transliterate' );
 		const mayuraRows = document.querySelectorAll( '.vaani-row-mayura' );
+
 		const syncRows = () => {
-			const isMayura = modelSelect.value === 'mayura:v1';
-			mayuraRows.forEach( ( row ) => {
-				row.style.display = isMayura ? '' : 'none';
+			const isTransliterate =
+				methodSelect && methodSelect.value === 'transliterate';
+			const isMayura = ! modelSelect || modelSelect.value === 'mayura:v1';
+
+			translateRows.forEach( ( row ) => {
+				row.style.display = isTransliterate ? 'none' : '';
 			} );
+			transliterateRows.forEach( ( row ) => {
+				row.style.display = isTransliterate ? '' : 'none';
+			} );
+			// Mayura rows are a subset of translate rows; hide them when the model
+			// isn't Mayura even while translation is the active method.
+			if ( ! isTransliterate ) {
+				mayuraRows.forEach( ( row ) => {
+					row.style.display = isMayura ? '' : 'none';
+				} );
+			}
 		};
-		modelSelect.addEventListener( 'change', syncRows );
+
+		if ( methodSelect ) {
+			methodSelect.addEventListener( 'change', syncRows );
+		}
+		if ( modelSelect ) {
+			modelSelect.addEventListener( 'change', syncRows );
+		}
 		syncRows();
 	}
 

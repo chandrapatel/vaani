@@ -135,12 +135,24 @@ class SettingsPage {
 		);
 
 		add_settings_field(
+			'translation_method',
+			__( 'Method', 'vaani' ),
+			array( $this, 'render_translation_method_field' ),
+			self::PAGE_SLUG,
+			'vaani_translation',
+			array( 'label_for' => 'vaani_translation_method' )
+		);
+
+		add_settings_field(
 			'translate_model',
 			__( 'Model', 'vaani' ),
 			array( $this, 'render_translate_model_field' ),
 			self::PAGE_SLUG,
 			'vaani_translation',
-			array( 'label_for' => 'vaani_translate_model' )
+			array(
+				'label_for' => 'vaani_translate_model',
+				'class'     => 'vaani-row-translate',
+			)
 		);
 
 		add_settings_field(
@@ -151,7 +163,7 @@ class SettingsPage {
 			'vaani_translation',
 			array(
 				'label_for' => 'vaani_translate_mode',
-				'class'     => 'vaani-row-mayura',
+				'class'     => 'vaani-row-translate vaani-row-mayura',
 			)
 		);
 
@@ -163,8 +175,29 @@ class SettingsPage {
 			'vaani_translation',
 			array(
 				'label_for' => 'vaani_translate_gender',
-				'class'     => 'vaani-row-mayura',
+				'class'     => 'vaani-row-translate',
 			)
+		);
+
+		add_settings_field(
+			'transliterate_numerals_format',
+			__( 'Numerals', 'vaani' ),
+			array( $this, 'render_transliterate_numerals_field' ),
+			self::PAGE_SLUG,
+			'vaani_translation',
+			array(
+				'label_for' => 'vaani_transliterate_numerals_format',
+				'class'     => 'vaani-row-transliterate',
+			)
+		);
+
+		add_settings_field(
+			'transliterate_spoken_form',
+			__( 'Spoken form', 'vaani' ),
+			array( $this, 'render_transliterate_spoken_form_field' ),
+			self::PAGE_SLUG,
+			'vaani_translation',
+			array( 'class' => 'vaani-row-transliterate' )
 		);
 
 		add_settings_section(
@@ -292,13 +325,71 @@ class SettingsPage {
 	}
 
 	/**
+	 * Render the conversion-method select (translate vs transliterate).
+	 */
+	public function render_translation_method_field(): void {
+		$current = $this->settings->get_translation_method();
+		$labels  = array(
+			Client::METHOD_TRANSLATE     => __( 'Translation — converts meaning into the target language', 'vaani' ),
+			Client::METHOD_TRANSLITERATE => __( 'Transliteration — converts script/sound; English terms are kept, spelled phonetically', 'vaani' ),
+		);
+
+		printf( '<select id="vaani_translation_method" name="%s[translation_method]">', esc_attr( Settings::OPTION_NAME ) );
+		foreach ( Client::METHODS as $method ) {
+			printf(
+				'<option value="%1$s" %2$s>%3$s</option>',
+				esc_attr( $method ),
+				selected( $current, $method, false ),
+				esc_html( $labels[ $method ] ?? $method )
+			);
+		}
+		echo '</select>';
+		echo '<p class="description">' . esc_html__( 'Transliteration writes the original words in the target script rather than translating them — useful for technical posts with terms that have no native equivalent.', 'vaani' ) . '</p>';
+	}
+
+	/**
+	 * Render the transliteration numeral-format select.
+	 */
+	public function render_transliterate_numerals_field(): void {
+		$current = $this->settings->get_transliterate_numerals_format();
+		$labels  = array(
+			'international' => __( 'International (0-9)', 'vaani' ),
+			'native'        => __( 'Native script numerals', 'vaani' ),
+		);
+
+		printf( '<select id="vaani_transliterate_numerals_format" name="%s[transliterate_numerals_format]">', esc_attr( Settings::OPTION_NAME ) );
+		foreach ( Client::NUMERALS_FORMATS as $format ) {
+			printf(
+				'<option value="%1$s" %2$s>%3$s</option>',
+				esc_attr( $format ),
+				selected( $current, $format, false ),
+				esc_html( $labels[ $format ] ?? $format )
+			);
+		}
+		echo '</select>';
+	}
+
+	/**
+	 * Render the transliteration spoken-form checkbox.
+	 */
+	public function render_transliterate_spoken_form_field(): void {
+		printf(
+			'<label><input type="checkbox" id="vaani_transliterate_spoken_form" name="%1$s[transliterate_spoken_form]" value="1" %2$s /> %3$s</label>',
+			esc_attr( Settings::OPTION_NAME ),
+			checked( $this->settings->get_transliterate_spoken_form(), true, false ),
+			esc_html__( 'Convert to a natural spoken form (expands symbols and numbers into spoken words)', 'vaani' )
+		);
+		echo '<p class="description">' . esc_html__( 'Leave off for faithful script-only conversion of written content.', 'vaani' ) . '</p>';
+	}
+
+	/**
 	 * Render the translation-model select.
 	 */
 	public function render_translate_model_field(): void {
 		$current = $this->settings->get_translate_model();
 		$labels  = array(
 			'mayura:v1'           => __( 'Mayura — tone & gender control, up to 1000 chars/request', 'vaani' ),
-			'sarvam-translate:v1' => __( 'Sarvam Translate — formal only, up to 2000 chars/request', 'vaani' ),
+			'sarvam-translate:v1' => __( 'Sarvam Translate — gender control, formal tone, up to 2000 chars/request', 'vaani' ),
 		);
 
 		printf( '<select id="vaani_translate_model" name="%s[translate_model]">', esc_attr( Settings::OPTION_NAME ) );
@@ -311,7 +402,7 @@ class SettingsPage {
 			);
 		}
 		echo '</select>';
-		echo '<p class="description">' . esc_html__( 'Tone and speaker gender apply to Mayura only.', 'vaani' ) . '</p>';
+		echo '<p class="description">' . esc_html__( 'Tone applies to Mayura only; speaker gender applies to both models.', 'vaani' ) . '</p>';
 	}
 
 	/**

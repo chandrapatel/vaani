@@ -34,9 +34,9 @@ class Client {
 	 * Translation models and their capabilities.
 	 *
 	 * `mayura:v1` supports tone modes, speaker gender, and transliteration but
-	 * caps input at 1000 chars. `sarvam-translate:v1` allows 2000 chars and
-	 * more languages, but only formal mode and no speaker-gender control (it
-	 * was observed to default to a female speaker and mix genders mid-content).
+	 * caps input at 1000 chars. `sarvam-translate:v1` allows 2000 chars and more
+	 * languages, and supports speaker gender (which keeps it from defaulting to a
+	 * female speaker and mixing genders mid-content) but only the formal mode.
 	 *
 	 * @var array<string, array{max_chars: int, supports_modes: bool, supports_gender: bool}>
 	 */
@@ -49,7 +49,7 @@ class Client {
 		'sarvam-translate:v1' => array(
 			'max_chars'       => 2000,
 			'supports_modes'  => false,
-			'supports_gender' => false,
+			'supports_gender' => true,
 		),
 	);
 
@@ -57,6 +57,41 @@ class Client {
 	 * Default translation model.
 	 */
 	public const DEFAULT_MODEL = 'mayura:v1';
+
+	/**
+	 * Conversion methods. `translate` converts meaning (the /translate endpoint);
+	 * `transliterate` converts script/sound (the /transliterate endpoint).
+	 */
+	public const METHOD_TRANSLATE     = 'translate';
+	public const METHOD_TRANSLITERATE = 'transliterate';
+
+	/**
+	 * Allowed conversion methods.
+	 *
+	 * @var string[]
+	 */
+	public const METHODS = array( self::METHOD_TRANSLATE, self::METHOD_TRANSLITERATE );
+
+	/**
+	 * Max input characters per /transliterate request (Sarvam caps this at 1000).
+	 */
+	public const TRANSLITERATE_MAX_CHARS = 1000;
+
+	/**
+	 * Allowed numeral formats for transliteration. `international` uses 0-9;
+	 * `native` uses language-specific numerals.
+	 *
+	 * @var string[]
+	 */
+	public const NUMERALS_FORMATS = array( 'international', 'native' );
+
+	/**
+	 * Allowed languages for spoken-form numerals (only applies when spoken form
+	 * is enabled).
+	 *
+	 * @var string[]
+	 */
+	public const SPOKEN_FORM_NUMERAL_LANGS = array( 'english', 'native' );
 
 	/**
 	 * Allowed translation tone modes (`mayura:v1`).
@@ -127,6 +162,27 @@ class Client {
 	private string $speaker_gender;
 
 	/**
+	 * Active conversion method (translate or transliterate).
+	 */
+	private string $method;
+
+	/**
+	 * Transliteration numeral format (`international` or `native`).
+	 */
+	private string $numerals_format;
+
+	/**
+	 * Whether transliteration converts text to a natural spoken form.
+	 */
+	private bool $spoken_form;
+
+	/**
+	 * Language for spoken-form numerals (`english` or `native`); only sent when
+	 * spoken form is enabled.
+	 */
+	private string $spoken_form_numerals_language;
+
+	/**
 	 * Text-to-speech model in use.
 	 */
 	private string $tts_model;
@@ -145,6 +201,9 @@ class Client {
 	 * @param string               $api_key Sarvam API key.
 	 * @param array<string, mixed> $config  Optional config. Translation keys:
 	 *                                        `model`, `mode`, `speaker_gender`.
+	 *                                        Method/transliteration keys: `method`,
+	 *                                        `numerals_format`, `spoken_form`,
+	 *                                        `spoken_form_numerals_language`.
 	 *                                        Audio keys: `tts_model`, `tts_speaker`,
 	 *                                        `tts_pace`.
 	 */
@@ -156,6 +215,14 @@ class Client {
 		$this->mode    = $config['mode'] ?? 'formal';
 		$this->speaker_gender = $config['speaker_gender'] ?? '';
 
+		$method                = $config['method'] ?? self::METHOD_TRANSLATE;
+		$this->method          = in_array( $method, self::METHODS, true ) ? $method : self::METHOD_TRANSLATE;
+		$numerals_format       = $config['numerals_format'] ?? 'native';
+		$this->numerals_format = in_array( $numerals_format, self::NUMERALS_FORMATS, true ) ? $numerals_format : 'native';
+		$this->spoken_form     = (bool) ( $config['spoken_form'] ?? false );
+		$spoken_numerals       = $config['spoken_form_numerals_language'] ?? 'native';
+		$this->spoken_form_numerals_language = in_array( $spoken_numerals, self::SPOKEN_FORM_NUMERAL_LANGS, true ) ? $spoken_numerals : 'native';
+
 		$tts_model       = $config['tts_model'] ?? self::DEFAULT_TTS_MODEL;
 		$this->tts_model = isset( self::TTS_MODELS[ $tts_model ] ) ? $tts_model : self::DEFAULT_TTS_MODEL;
 		$this->tts_speaker = (string) ( $config['tts_speaker'] ?? '' );
@@ -163,10 +230,28 @@ class Client {
 	}
 
 	/**
-	 * Max input characters per translation request for the configured model.
+	 * Max input characters per request for the active conversion method:
+	 * the transliterate cap, or the configured translation model's limit.
 	 */
 	public function max_input_chars(): int {
-		return self::TRANSLATE_MODELS[ $this->model ]['max_chars'];
+		return self::METHOD_TRANSLITERATE === $this->method
+			? self::TRANSLITERATE_MAX_CHARS
+			: self::TRANSLATE_MODELS[ $this->model ]['max_chars'];
+	}
+
+	/**
+	 * Convert a single string of text using the active method, dispatching to
+	 * translation or transliteration. The block engine calls this so it stays
+	 * method-agnostic.
+	 *
+	 * @param string $text        Text to convert.
+	 * @param string $source_code Sarvam source language code (e.g. `en-IN`).
+	 * @param string $target_code Sarvam target language code (e.g. `hi-IN`).
+	 */
+	public function convert( string $text, string $source_code, string $target_code ): Response {
+		return self::METHOD_TRANSLITERATE === $this->method
+			? $this->transliterate_text( $text, $source_code, $target_code )
+			: $this->translate_text( $text, $source_code, $target_code );
 	}
 
 	/**
@@ -303,6 +388,68 @@ class Client {
 
 		if ( $capabilities['supports_gender'] && in_array( $this->speaker_gender, self::SPEAKER_GENDERS, true ) ) {
 			$body['speaker_gender'] = $this->speaker_gender;
+		}
+
+		return $body;
+	}
+
+	/**
+	 * Transliterate a single string of text (script/sound conversion).
+	 *
+	 * Mirrors {@see self::translate_text()} but hits the /transliterate endpoint.
+	 * Operates on plain text only; the caller keeps `$text` within
+	 * {@see self::max_input_chars()}.
+	 *
+	 * @param string $text        Text to transliterate.
+	 * @param string $source_code Sarvam source language code (e.g. `en-IN`).
+	 * @param string $target_code Sarvam target language code (e.g. `hi-IN`).
+	 */
+	public function transliterate_text( string $text, string $source_code, string $target_code ): Response {
+		if ( '' === trim( $this->api_key ) ) {
+			return Response::failure( __( 'No API key set.', 'vaani' ) );
+		}
+
+		// Nothing to transliterate (whitespace/punctuation only) — return as-is.
+		if ( '' === trim( $text ) ) {
+			return Response::success( $text );
+		}
+
+		$response = $this->request( '/transliterate', $this->transliterate_body( $text, $source_code, $target_code ) );
+
+		if ( is_wp_error( $response ) ) {
+			return Response::failure( $response->get_error_message() );
+		}
+
+		$code = (int) wp_remote_retrieve_response_code( $response );
+		$body = json_decode( (string) wp_remote_retrieve_body( $response ), true );
+
+		if ( $code < 200 || $code >= 300 || ! is_array( $body ) || ! isset( $body['transliterated_text'] ) ) {
+			return Response::failure( $this->error_message( $code, $body ) );
+		}
+
+		return Response::success(
+			(string) $body['transliterated_text'],
+			(int) mb_strlen( $text )
+		);
+	}
+
+	/**
+	 * Build the /transliterate request body. `spoken_form_numerals_language`
+	 * only applies when spoken form is enabled, so it is omitted otherwise.
+	 *
+	 * @return array<string, mixed>
+	 */
+	private function transliterate_body( string $text, string $source_code, string $target_code ): array {
+		$body = array(
+			'input'                => $text,
+			'source_language_code' => $source_code,
+			'target_language_code' => $target_code,
+			'numerals_format'      => $this->numerals_format,
+		);
+
+		if ( $this->spoken_form ) {
+			$body['spoken_form']                   = true;
+			$body['spoken_form_numerals_language'] = $this->spoken_form_numerals_language;
 		}
 
 		return $body;
