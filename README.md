@@ -43,17 +43,16 @@ The distributed zip is self-contained — `vendor/` (Composer + Action Scheduler
      the target script, spelled phonetically (e.g. English → Devanagari). Useful for technical
      posts with English terms that have no native equivalent. Options: **numerals**
      (international `0-9` vs native script) and an optional **spoken form**.
-3. **Pick languages per post** — in the block editor, use the **Translate into** panel to tick
-   which enabled languages this post should be translated into.
-4. **Translate** — in the **Vaani Translations** meta box, click **Translate now** for a
-   language. The work runs in the background (Action Scheduler) and never blocks the editor.
-   When it finishes, the row shows **Translated** with an **Edit** link; the translation opens
-   in the block editor as native blocks.
-5. **Re-translate** — once a translation exists the button reads **Re-translate**. It
+3. **Translate** — in the block editor, open the **Vaani** sidebar (the translation icon in the
+   editor toolbar). Its **Translations** section lists every enabled target language; click
+   **Translate now** for one. The work runs in the background (Action Scheduler) and never blocks
+   the editor — click **Refresh** to pull the result. When it finishes, the row shows
+   **Translated** with an **Edit** link; the translation opens in the block editor as native blocks.
+4. **Re-translate** — once a translation exists the button reads **Re-translate**. It
    regenerates from the latest saved source content and **overwrites in place** (same post, so
    revision history is preserved). When you edit the English source, its translations show a
    **(stale)** badge until re-translated. A failed run shows **Failed** with the Sarvam error.
-6. **Translate in bulk** — from the *Posts*/*Pages* list, select rows and choose
+5. **Translate in bulk** — from the *Posts*/*Pages* list, select rows and choose
    **Vaani: Translate to all enabled languages** to queue them at once.
 
 Settings changes (method/model/tone/gender) apply to the *next* translation; existing
@@ -61,9 +60,9 @@ translations are not auto-regenerated.
 
 ### Audio (text-to-speech)
 
-In the **Vaani Audio** meta box, click **Generate audio** for a language to synthesize an MP3
-via Sarvam TTS. It runs in the background and is stored in the media library. Readers get a
-**Listen** player on the translated page.
+In the **Audio** section of the **Vaani** sidebar, click **Generate** for a language to
+synthesize an MP3 via Sarvam TTS. It runs in the background and is stored in the media library;
+click **Refresh** to pull the result. Readers get a **Listen** player on the translated page.
 
 ### Reading translations (front end)
 
@@ -79,8 +78,8 @@ via Sarvam TTS. It runs in the background and is stored in the media library. Re
 ### Usage & cost
 
 *Dashboard → Vaani usage* shows this month's translations, audio count, and an estimated INR
-spend; each post's meta box shows its own running estimate. Estimates are based on a local log of
-every Sarvam call.
+spend; the **Vaani** sidebar shows each post's own running estimate. Estimates are based on a
+local log of every Sarvam call.
 
 ## What gets translated
 

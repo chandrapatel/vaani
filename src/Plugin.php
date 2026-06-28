@@ -9,11 +9,13 @@ declare( strict_types=1 );
 
 namespace Vaani;
 
+use Vaani\Admin\EditorSidebar;
 use Vaani\Admin\SettingsPage;
-use Vaani\Audio\Admin\AudioMetaBox;
 use Vaani\Audio\AudioCleanup;
 use Vaani\Audio\AudioRepository;
 use Vaani\Audio\AudioService;
+use Vaani\Audio\AudioStatusPresenter;
+use Vaani\Audio\Rest\AudioController;
 use Vaani\Core\Crypto;
 use Vaani\Core\Queue;
 use Vaani\Core\Settings;
@@ -24,13 +26,13 @@ use Vaani\Frontend\LanguageSwitcher;
 use Vaani\Frontend\Router;
 use Vaani\Seo\Hreflang;
 use Vaani\Seo\YoastAdapter;
-use Vaani\Translation\Admin\LanguagePanel;
 use Vaani\Translation\Admin\TranslationBulkAction;
-use Vaani\Translation\Admin\TranslationMetaBox;
+use Vaani\Translation\Rest\TranslationController;
 use Vaani\Translation\TranslationCleanup;
 use Vaani\Translation\TranslationPostType;
 use Vaani\Translation\TranslationRepository;
 use Vaani\Translation\TranslationService;
+use Vaani\Translation\TranslationStatusPresenter;
 use Vaani\Usage\Admin\UsageDashboardWidget;
 use Vaani\Usage\UsageLogger;
 use Vaani\Usage\UsageRepository;
@@ -52,7 +54,6 @@ class Plugin {
 		$settings = new Settings( new Crypto() );
 
 		( new SettingsPage( $settings ) )->register();
-		( new LanguagePanel( $settings ) )->register();
 
 		// Usage & billing (Phase 5).
 		$usage_repo = new UsageRepository();
@@ -67,7 +68,8 @@ class Plugin {
 		$service    = new TranslationService( $repository, new Queue(), $settings );
 		$service->register();
 
-		( new TranslationMetaBox( $settings, $repository, $service, $usage_repo ) )->register();
+		$translation_presenter = new TranslationStatusPresenter( $settings, $repository, $usage_repo );
+		( new TranslationController( $service, $translation_presenter ) )->register();
 		( new TranslationBulkAction( $settings, $service ) )->register();
 		( new TranslationCleanup( $repository ) )->register();
 
@@ -86,9 +88,13 @@ class Plugin {
 		$audio_service = new AudioService( $audio_repo, $repository, new Queue(), $settings );
 		$audio_service->register();
 
-		( new AudioMetaBox( $settings, $available, $audio_repo, $audio_service ) )->register();
+		$audio_presenter = new AudioStatusPresenter( $settings, $available, $audio_repo );
+		( new AudioController( $audio_service, $audio_presenter ) )->register();
 		( new AudioPlayer( $audio_repo, $settings ) )->register();
 		( new AudioCleanup( $audio_repo ) )->register();
+
+		// Block-editor sidebar replacing the translation/audio meta boxes.
+		( new EditorSidebar( $settings, $translation_presenter, $audio_presenter ) )->register();
 	}
 
 	/**
