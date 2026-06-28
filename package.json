@@ -8,6 +8,9 @@
 		"node": ">=24"
 	},
 	"10up-toolkit": {
+		"paths": {
+			"blocksDir": "./assets/blocks/"
+		},
 		"entry": {
 			"admin-settings": "assets/js/admin-settings.js",
 			"editor-language-panel": "assets/js/editor-language-panel.js",

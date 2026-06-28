@@ -1,0 +1,17 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "vaani/language-switcher",
+	"title": "Vaani Language Switcher",
+	"category": "widgets",
+	"icon": "translation",
+	"description": "Links to this post's available translations.",
+	"keywords": [ "language", "translation", "vaani" ],
+	"textdomain": "vaani",
+	"supports": {
+		"html": false,
+		"align": [ "left", "center", "right" ]
+	},
+	"editorScript": "file:./index.js",
+	"style": "file:./style.css"
+}

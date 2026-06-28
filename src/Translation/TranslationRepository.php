@@ -57,6 +57,47 @@ class TranslationRepository {
 	}
 
 	/**
+	 * Find a front-end-renderable translation for a source post and language.
+	 *
+	 * Stricter than {@see self::find()}: only a published post whose lifecycle
+	 * status is `completed` qualifies, so drafts, pending placeholders, and
+	 * failed jobs are never served to readers. Staleness is intentionally not
+	 * considered — a stale translation still renders for readers and is flagged
+	 * only in the editor (see {@see \Vaani\Frontend\AvailableTranslations}).
+	 */
+	public function find_renderable( int $source_id, string $lang ): ?WP_Post {
+		$query = new \WP_Query(
+			array(
+				'post_type'              => TranslationPostType::POST_TYPE,
+				'post_status'            => 'publish',
+				'posts_per_page'         => 1,
+				'no_found_rows'          => true,
+				'update_post_term_cache' => false,
+				'ignore_sticky_posts'    => true,
+				'meta_query'             => array(
+					'relation' => 'AND',
+					array(
+						'key'   => TranslationPostType::META_SOURCE_ID,
+						'value' => $source_id,
+					),
+					array(
+						'key'   => TranslationPostType::META_LANG,
+						'value' => $lang,
+					),
+					array(
+						'key'   => TranslationPostType::META_STATUS,
+						'value' => TranslationPostType::STATUS_COMPLETED,
+					),
+				),
+			)
+		);
+
+		$post = $query->posts[0] ?? null;
+
+		return $post instanceof WP_Post ? $post : null;
+	}
+
+	/**
 	 * Create a translation post linked to a source.
 	 *
 	 * @param array<string, mixed> $data {

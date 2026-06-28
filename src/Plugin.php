@@ -13,6 +13,11 @@ use Vaani\Admin\SettingsPage;
 use Vaani\Core\Crypto;
 use Vaani\Core\Queue;
 use Vaani\Core\Settings;
+use Vaani\Frontend\AvailableTranslations;
+use Vaani\Frontend\ContentRenderer;
+use Vaani\Frontend\LanguageSwitcher;
+use Vaani\Frontend\Router;
+use Vaani\Seo\Hreflang;
 use Vaani\Translation\Admin\LanguagePanel;
 use Vaani\Translation\Admin\TranslationMetaBox;
 use Vaani\Translation\TranslationPostType;
@@ -45,6 +50,14 @@ class Plugin {
 		$service->register();
 
 		( new TranslationMetaBox( $settings, $repository, $service ) )->register();
+
+		// Front-end rendering, URLs & SEO (Phase 3).
+		$available = new AvailableTranslations( $repository );
+
+		( new Router() )->register();
+		( new ContentRenderer( $available ) )->register();
+		( new LanguageSwitcher( $available, $settings ) )->register();
+		( new Hreflang( $available, $settings ) )->register();
 	}
 
 	/**

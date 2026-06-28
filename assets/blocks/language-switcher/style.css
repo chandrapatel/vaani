@@ -1,0 +1,26 @@
+/**
+ * Vaani — Language Switcher (front-end).
+ */
+.vaani-language-switcher__list {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.75em;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.vaani-language-switcher__item {
+	margin: 0;
+}
+
+.vaani-language-switcher__current {
+	font-weight: 600;
+}
+
+.vaani-language-switcher--placeholder {
+	padding: 0.75em 1em;
+	border: 1px dashed currentColor;
+	opacity: 0.7;
+	font-style: italic;
+}

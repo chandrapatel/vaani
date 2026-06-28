@@ -9,6 +9,8 @@ declare( strict_types=1 );
 
 namespace Vaani;
 
+use Vaani\Frontend\Router;
+
 defined( 'ABSPATH' ) || exit;
 
 /**
@@ -19,11 +21,12 @@ class Activator {
 	/**
 	 * Activation handler.
 	 *
-	 * Flushes rewrite rules so the lifecycle hook is in place for the
-	 * path-prefixed translation URLs added in Phase 3. No rules are
-	 * registered yet, and no tables are created in Phase 0.
+	 * Registers the path-prefixed translation rewrite rules and flushes so they
+	 * take effect immediately — the plugin's own `init` hook may not have run on
+	 * the activation request, so we add the rules here rather than relying on it.
 	 */
 	public static function activate(): void {
+		Router::add_rewrite_rules();
 		flush_rewrite_rules();
 	}
 }
