@@ -1,6 +1,6 @@
 {
 	"name": "vaani",
-	"version": "1.0.0",
+	"version": "0.1.0",
 	"description": "AI Translation & Audio for Indian Blogs.",
 	"license": "GPL-2.0-or-later",
 	"private": true,

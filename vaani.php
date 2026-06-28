@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Vaani – AI Translation & Audio for Indian Blogs
  * Description:        Translate posts and pages into Indian languages and generate per-language audio using Sarvam AI.
- * Version:           1.0.0
+ * Version:           0.1.0
  * Requires at least: 6.4
  * Requires PHP:      8.0
  * Author:            Chandra Patel
@@ -20,7 +20,7 @@ namespace Vaani;
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'VAANI_VERSION', '1.0.0' );
+define( 'VAANI_VERSION', '0.1.0' );
 define( 'VAANI_FILE', __FILE__ );
 define( 'VAANI_DIR', plugin_dir_path( __FILE__ ) );
 define( 'VAANI_URL', plugin_dir_url( __FILE__ ) );
