@@ -1,0 +1,581 @@
+# Copyright (C) 2026 Chandra Patel
+# This file is distributed under the GPL-2.0-or-later.
+msgid ""
+msgstr ""
+"Project-Id-Version: Vaani – AI Translation & Audio for Indian Blogs 1.0.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/vaani\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-06-28T17:20:28+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.12.0\n"
+"X-Domain: vaani\n"
+
+#. Plugin Name of the plugin
+#: vaani.php
+msgid "Vaani – AI Translation & Audio for Indian Blogs"
+msgstr ""
+
+#. Description of the plugin
+#: vaani.php
+msgid "Translate posts and pages into Indian languages and generate per-language audio using Sarvam AI."
+msgstr ""
+
+#. Author of the plugin
+#: vaani.php
+msgid "Chandra Patel"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:68
+#: src/Admin/SettingsPage.php:69
+#: src/Admin/SettingsPage.php:563
+msgid "Vaani"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:92
+msgid "Sarvam AI"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:99
+msgid "API key"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:108
+msgid "Default source language"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:117
+msgid "Target languages"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:125
+msgid "Translatable content"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:133
+#: src/Translation/TranslationPostType.php:89
+msgid "Translation"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:140
+msgid "Method"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:149
+#: src/Admin/SettingsPage.php:213
+msgid "Model"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:161
+msgid "Tone"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:173
+msgid "Speaker gender"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:185
+msgid "Numerals"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:197
+msgid "Spoken form"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:206
+msgid "Audio"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:222
+msgid "Voice"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:231
+msgid "Pace"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:242
+msgid "SEO"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:249
+msgid "Yoast SEO meta"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:269
+msgid "Saved — leave blank to keep"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:269
+msgid "Enter your Sarvam API key"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:276
+msgid "Remove the saved key"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:280
+msgid "Stored encrypted in the database."
+msgstr ""
+
+#: src/Admin/SettingsPage.php:320
+msgid "Languages enabled here appear as per-post options in the editor."
+msgstr ""
+
+#: src/Admin/SettingsPage.php:329
+msgid "Posts"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:330
+msgid "Pages"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:352
+msgid "Translation — converts meaning into the target language"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:353
+msgid "Transliteration — converts script/sound; English terms are kept, spelled phonetically"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:366
+msgid "Transliteration writes the original words in the target script rather than translating them — useful for technical posts with terms that have no native equivalent."
+msgstr ""
+
+#: src/Admin/SettingsPage.php:375
+msgid "International (0-9)"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:376
+msgid "Native script numerals"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:399
+msgid "Convert to a natural spoken form (expands symbols and numbers into spoken words)"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:401
+msgid "Leave off for faithful script-only conversion of written content."
+msgstr ""
+
+#: src/Admin/SettingsPage.php:412
+msgid "Translate the Yoast SEO title and description when translating content"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:414
+msgid "Translates manually-set Yoast SEO title, meta description, and social (OG/Twitter) fields. Adds Sarvam usage per language."
+msgstr ""
+
+#: src/Admin/SettingsPage.php:423
+msgid "Mayura — tone & gender control, up to 1000 chars/request"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:424
+msgid "Sarvam Translate — gender control, formal tone, up to 2000 chars/request"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:437
+msgid "Tone applies to Mayura only; speaker gender applies to both models."
+msgstr ""
+
+#: src/Admin/SettingsPage.php:446
+msgid "Formal"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:447
+msgid "Modern colloquial"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:448
+msgid "Classic colloquial"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:449
+msgid "Code-mixed"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:470
+msgid "Male"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:471
+msgid "Female"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:484
+msgid "Helps keep first-person verb forms consistent across the translation."
+msgstr ""
+
+#: src/Admin/SettingsPage.php:493
+msgid "Bulbul v3 — latest, up to 2500 chars/request"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:494
+msgid "Bulbul v2 — up to 1500 chars/request"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:523
+msgid "Automatic (model default)"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:539
+msgid "Pick a voice that belongs to the selected model."
+msgstr ""
+
+#: src/Admin/SettingsPage.php:551
+msgid "Speaking speed from 0.5 (slow) to 2.0 (fast); 1.0 is normal."
+msgstr ""
+
+#: src/Admin/SettingsPage.php:572
+msgid "Connection"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:575
+msgid "Test connection"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:615
+msgid "Testing…"
+msgstr ""
+
+#: src/Admin/SettingsPage.php:616
+msgid "Something went wrong. Please try again."
+msgstr ""
+
+#: src/Admin/SettingsPage.php:629
+#: src/Audio/Admin/AudioMetaBox.php:251
+#: src/Translation/Admin/TranslationMetaBox.php:290
+msgid "You are not allowed to do this."
+msgstr ""
+
+#. translators: %s: settings page URL.
+#: src/Admin/SettingsPage.php:662
+#, php-format
+msgid "Vaani needs a Sarvam API key to translate content. <a href=\"%s\">Add your key</a>."
+msgstr ""
+
+#: src/Audio/Admin/AudioMetaBox.php:75
+msgid "Vaani Audio"
+msgstr ""
+
+#: src/Audio/Admin/AudioMetaBox.php:91
+msgid "Generate spoken audio of the original and each published translation."
+msgstr ""
+
+#: src/Audio/Admin/AudioMetaBox.php:97
+msgid "Regenerate"
+msgstr ""
+
+#: src/Audio/Admin/AudioMetaBox.php:98
+msgid "Generate"
+msgstr ""
+
+#: src/Audio/Admin/AudioMetaBox.php:136
+#: src/Frontend/AudioPlayer.php:162
+#: src/Frontend/LanguageSwitcher.php:208
+msgid "English"
+msgstr ""
+
+#: src/Audio/Admin/AudioMetaBox.php:149
+#: src/Translation/Admin/TranslationMetaBox.php:184
+msgid "Queued…"
+msgstr ""
+
+#: src/Audio/Admin/AudioMetaBox.php:153
+#: src/Translation/Admin/TranslationMetaBox.php:191
+msgid "Failed"
+msgstr ""
+
+#: src/Audio/Admin/AudioMetaBox.php:157
+msgid "Not generated"
+msgstr ""
+
+#: src/Audio/Admin/AudioMetaBox.php:160
+msgid "Generated"
+msgstr ""
+
+#: src/Audio/Admin/AudioMetaBox.php:163
+#: src/Translation/Admin/TranslationMetaBox.php:200
+msgid "(stale)"
+msgstr ""
+
+#: src/Audio/Admin/AudioMetaBox.php:171
+msgid "File"
+msgstr ""
+
+#: src/Audio/Admin/AudioMetaBox.php:234
+#: src/Translation/Admin/TranslationMetaBox.php:273
+msgid "Queueing…"
+msgstr ""
+
+#: src/Audio/Admin/AudioMetaBox.php:235
+msgid "Could not queue audio. Please try again."
+msgstr ""
+
+#: src/Audio/Admin/AudioMetaBox.php:257
+msgid "Audio cannot be generated for that language yet."
+msgstr ""
+
+#: src/Core/Language/SupportedLanguages.php:35
+msgid "Hindi"
+msgstr ""
+
+#: src/Core/Language/SupportedLanguages.php:36
+msgid "Bengali"
+msgstr ""
+
+#: src/Core/Language/SupportedLanguages.php:37
+msgid "Gujarati"
+msgstr ""
+
+#: src/Core/Language/SupportedLanguages.php:38
+msgid "Kannada"
+msgstr ""
+
+#: src/Core/Language/SupportedLanguages.php:39
+msgid "Malayalam"
+msgstr ""
+
+#: src/Core/Language/SupportedLanguages.php:40
+msgid "Marathi"
+msgstr ""
+
+#: src/Core/Language/SupportedLanguages.php:41
+msgid "Odia"
+msgstr ""
+
+#: src/Core/Language/SupportedLanguages.php:42
+msgid "Punjabi"
+msgstr ""
+
+#: src/Core/Language/SupportedLanguages.php:43
+msgid "Tamil"
+msgstr ""
+
+#: src/Core/Language/SupportedLanguages.php:44
+msgid "Telugu"
+msgstr ""
+
+#: src/Core/Sarvam/Client.php:279
+#: src/Core/Sarvam/Client.php:341
+#: src/Core/Sarvam/Client.php:409
+#: src/Core/Sarvam/Client.php:473
+msgid "No API key set."
+msgstr ""
+
+#: src/Core/Sarvam/Client.php:310
+msgid "Connection successful."
+msgstr ""
+
+#: src/Core/Sarvam/Client.php:317
+msgid "The API key was rejected. Check the key and try again."
+msgstr ""
+
+#. translators: %d: HTTP status code.
+#: src/Core/Sarvam/Client.php:324
+#: src/Core/Sarvam/Client.php:586
+#, php-format
+msgid "Sarvam returned an unexpected response (HTTP %d)."
+msgstr ""
+
+#: src/Core/Sarvam/Client.php:477
+msgid "Nothing to convert to speech."
+msgstr ""
+
+#: src/Core/Sarvam/Client.php:582
+msgid "The Sarvam API key was rejected."
+msgstr ""
+
+#: src/Frontend/AudioPlayer.php:136
+msgid "Listen to this article"
+msgstr ""
+
+#: src/Frontend/LanguageSwitcher.php:147
+msgid "Choose a language"
+msgstr ""
+
+#: src/Frontend/LanguageSwitcher.php:235
+msgid "Vaani Language Switcher"
+msgstr ""
+
+#: src/Frontend/LanguageSwitcher.php:236
+msgid "Links to this post's available translations."
+msgstr ""
+
+#: src/Frontend/LanguageSwitcher.php:275
+msgid "Title:"
+msgstr ""
+
+#: src/Translation/Admin/TranslationBulkAction.php:84
+msgid "Vaani: Translate to all enabled languages"
+msgstr ""
+
+#: src/Translation/Admin/TranslationBulkAction.php:153
+msgid "Vaani: nothing was queued. Enable target languages in Vaani settings, then try again."
+msgstr ""
+
+#. translators: 1: number of translations queued, 2: number of posts.
+#: src/Translation/Admin/TranslationBulkAction.php:158
+#, php-format
+msgid "Vaani queued %1$s translation across %2$s post."
+msgid_plural "Vaani queued %1$s translations across %2$s posts."
+msgstr[0] ""
+msgstr[1] ""
+
+#. translators: %s: number of posts skipped.
+#: src/Translation/Admin/TranslationBulkAction.php:173
+#, php-format
+msgid "%s post was skipped."
+msgid_plural "%s posts were skipped."
+msgstr[0] ""
+msgstr[1] ""
+
+#: src/Translation/Admin/TranslationMetaBox.php:74
+#: src/Translation/TranslationPostType.php:90
+msgid "Vaani Translations"
+msgstr ""
+
+#: src/Translation/Admin/TranslationMetaBox.php:92
+msgid "Pick target languages in the “Translate into” panel, then return here to translate."
+msgstr ""
+
+#: src/Translation/Admin/TranslationMetaBox.php:98
+msgid "Translations use the last saved content. Save the post first if you have unsaved changes."
+msgstr ""
+
+#: src/Translation/Admin/TranslationMetaBox.php:104
+msgid "Re-translate"
+msgstr ""
+
+#: src/Translation/Admin/TranslationMetaBox.php:105
+msgid "Translate now"
+msgstr ""
+
+#. translators: 1: estimated rupee amount, 2: character count.
+#: src/Translation/Admin/TranslationMetaBox.php:139
+#, php-format
+msgid "This post: ~₹%1$s estimated · %2$s characters sent to Sarvam."
+msgstr ""
+
+#: src/Translation/Admin/TranslationMetaBox.php:176
+msgid "Not translated"
+msgstr ""
+
+#: src/Translation/Admin/TranslationMetaBox.php:198
+msgid "Translated"
+msgstr ""
+
+#: src/Translation/Admin/TranslationMetaBox.php:212
+msgid "Edit"
+msgstr ""
+
+#: src/Translation/Admin/TranslationMetaBox.php:274
+msgid "Could not queue translation. Please try again."
+msgstr ""
+
+#: src/Translation/Admin/TranslationMetaBox.php:296
+msgid "That language cannot be translated."
+msgstr ""
+
+#: src/Translation/TranslationPostType.php:88
+#: src/Usage/Admin/UsageDashboardWidget.php:69
+msgid "Translations"
+msgstr ""
+
+#: src/Usage/Admin/UsageDashboardWidget.php:56
+msgid "Vaani — Usage this month"
+msgstr ""
+
+#: src/Usage/Admin/UsageDashboardWidget.php:70
+msgid "Audio files"
+msgstr ""
+
+#: src/Usage/Admin/UsageDashboardWidget.php:71
+msgid "Characters used"
+msgstr ""
+
+#: src/Usage/Admin/UsageDashboardWidget.php:73
+msgid "Est. cost"
+msgstr ""
+
+#. translators: %s: estimated cost amount in Indian rupees.
+#: src/Usage/Admin/UsageDashboardWidget.php:75
+#, php-format
+msgid "~₹%s"
+msgstr ""
+
+#. translators: 1: Sarvam pricing page link, 2: Sarvam usage dashboard link.
+#: src/Usage/Admin/UsageDashboardWidget.php:84
+#, php-format
+msgid "Cost is a rough estimate from published per-character rates and may not match what Sarvam bills. Check the <a href=\"%1$s\" target=\"_blank\" rel=\"noopener\">pricing</a> and your <a href=\"%2$s\" target=\"_blank\" rel=\"noopener\">Sarvam usage dashboard</a> for actual usage and cost."
+msgstr ""
+
+#: assets/blocks/audio-player/index.js:22
+msgid "Vaani Audio Player — the “Listen” player appears here on the front end."
+msgstr ""
+
+#: assets/blocks/language-switcher/index.js:22
+msgid "Vaani Language Switcher — links appear here on the front end."
+msgstr ""
+
+#: assets/js/editor-language-panel.js:42
+msgid "Translate into"
+msgstr ""
+
+#: assets/js/editor-language-panel.js:47
+msgid "No target languages are enabled yet. <a>Enable languages in Vaani settings</a>."
+msgstr ""
+
+#: assets/blocks/audio-player/block.json
+msgctxt "block title"
+msgid "Vaani Audio Player"
+msgstr ""
+
+#: assets/blocks/audio-player/block.json
+msgctxt "block description"
+msgid "Plays this post's audio in the language being viewed."
+msgstr ""
+
+#: assets/blocks/audio-player/block.json
+msgctxt "block keyword"
+msgid "audio"
+msgstr ""
+
+#: assets/blocks/audio-player/block.json
+msgctxt "block keyword"
+msgid "listen"
+msgstr ""
+
+#: assets/blocks/audio-player/block.json
+msgctxt "block keyword"
+msgid "tts"
+msgstr ""
+
+#: assets/blocks/audio-player/block.json
+#: assets/blocks/language-switcher/block.json
+msgctxt "block keyword"
+msgid "vaani"
+msgstr ""
+
+#: assets/blocks/language-switcher/block.json
+msgctxt "block title"
+msgid "Vaani Language Switcher"
+msgstr ""
+
+#: assets/blocks/language-switcher/block.json
+msgctxt "block description"
+msgid "Links to this post's available translations."
+msgstr ""
+
+#: assets/blocks/language-switcher/block.json
+msgctxt "block keyword"
+msgid "language"
+msgstr ""
+
+#: assets/blocks/language-switcher/block.json
+msgctxt "block keyword"
+msgid "translation"
+msgstr ""

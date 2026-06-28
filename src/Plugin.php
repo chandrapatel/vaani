@@ -11,6 +11,7 @@ namespace Vaani;
 
 use Vaani\Admin\SettingsPage;
 use Vaani\Audio\Admin\AudioMetaBox;
+use Vaani\Audio\AudioCleanup;
 use Vaani\Audio\AudioRepository;
 use Vaani\Audio\AudioService;
 use Vaani\Core\Crypto;
@@ -22,8 +23,11 @@ use Vaani\Frontend\ContentRenderer;
 use Vaani\Frontend\LanguageSwitcher;
 use Vaani\Frontend\Router;
 use Vaani\Seo\Hreflang;
+use Vaani\Seo\YoastAdapter;
 use Vaani\Translation\Admin\LanguagePanel;
+use Vaani\Translation\Admin\TranslationBulkAction;
 use Vaani\Translation\Admin\TranslationMetaBox;
+use Vaani\Translation\TranslationCleanup;
 use Vaani\Translation\TranslationPostType;
 use Vaani\Translation\TranslationRepository;
 use Vaani\Translation\TranslationService;
@@ -64,14 +68,18 @@ class Plugin {
 		$service->register();
 
 		( new TranslationMetaBox( $settings, $repository, $service, $usage_repo ) )->register();
+		( new TranslationBulkAction( $settings, $service ) )->register();
+		( new TranslationCleanup( $repository ) )->register();
 
 		// Front-end rendering, URLs & SEO (Phase 3).
 		$available = new AvailableTranslations( $repository );
+		$available->register();
 
 		( new Router() )->register();
 		( new ContentRenderer( $available ) )->register();
 		( new LanguageSwitcher( $available, $settings ) )->register();
 		( new Hreflang( $available, $settings ) )->register();
+		( new YoastAdapter( $available ) )->register();
 
 		// Audio generation (Phase 4).
 		$audio_repo    = new AudioRepository();
@@ -80,6 +88,7 @@ class Plugin {
 
 		( new AudioMetaBox( $settings, $available, $audio_repo, $audio_service ) )->register();
 		( new AudioPlayer( $audio_repo, $settings ) )->register();
+		( new AudioCleanup( $audio_repo ) )->register();
 	}
 
 	/**

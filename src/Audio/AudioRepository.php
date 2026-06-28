@@ -55,6 +55,27 @@ class AudioRepository {
 	}
 
 	/**
+	 * Every audio attachment ID linked to a source post, across all languages.
+	 *
+	 * Used by cleanup when the source is permanently deleted (CLAUDE.md §6).
+	 *
+	 * @return int[]
+	 */
+	public function all_audio_ids( int $source_id ): array {
+		$audio = $this->array_meta( $source_id, self::META_AUDIO );
+
+		$ids = array();
+		foreach ( $audio as $attachment_id ) {
+			$attachment_id = (int) $attachment_id;
+			if ( $attachment_id > 0 ) {
+				$ids[] = $attachment_id;
+			}
+		}
+
+		return $ids;
+	}
+
+	/**
 	 * Public URL of a language's audio, or '' if none exists.
 	 */
 	public function get_audio_url( int $source_id, string $lang ): string {

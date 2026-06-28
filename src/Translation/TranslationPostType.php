@@ -49,6 +49,12 @@ class TranslationPostType {
 	public const META_STATUS = '_vaani_status';
 
 	/**
+	 * Last error message from a failed translation job, for editor feedback.
+	 * Cleared on the next successful run.
+	 */
+	public const META_ERROR = '_vaani_error';
+
+	/**
 	 * Per-translation slug. Stored but unused in v1 (CLAUDE.md seam #3): v1
 	 * mirrors the source slug, so persisting this now makes translated slugs
 	 * additive later instead of a data migration.
@@ -94,7 +100,7 @@ class TranslationPostType {
 				'query_var'           => false,
 				'hierarchical'        => false,
 				'menu_icon'           => 'dashicons-translation',
-				'supports'            => array( 'title', 'editor', 'revisions' ),
+				'supports'            => array( 'title', 'editor', 'excerpt', 'revisions' ),
 				'capability_type'     => 'post',
 				'map_meta_cap'        => true,
 			)
@@ -113,6 +119,7 @@ class TranslationPostType {
 			self::META_LANG,
 			self::META_SOURCE_HASH,
 			self::META_STATUS,
+			self::META_ERROR,
 			self::META_TRANSLATED_SLUG,
 		);
 

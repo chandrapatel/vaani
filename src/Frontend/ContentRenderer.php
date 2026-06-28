@@ -77,6 +77,12 @@ class ContentRenderer {
 		$source->post_title   = $translation->post_title;
 		$source->post_content = $translation->post_content;
 
+		// Swap the excerpt too when the translation has one, so archives, search
+		// results, and meta-description fallbacks on /<lang>/ stay translated.
+		if ( '' !== trim( (string) $translation->post_excerpt ) ) {
+			$source->post_excerpt = $translation->post_excerpt;
+		}
+
 		return $posts;
 	}
 
