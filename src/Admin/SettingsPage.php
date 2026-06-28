@@ -12,6 +12,7 @@ namespace Vaani\Admin;
 use Vaani\Core\Language\SupportedLanguages;
 use Vaani\Core\Sarvam\Client;
 use Vaani\Core\Settings;
+use Vaani\Seo\YoastAdapter;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -233,6 +234,24 @@ class SettingsPage {
 			'vaani_audio',
 			array( 'label_for' => 'vaani_audio_pace' )
 		);
+
+		// SEO section only appears when a supported SEO plugin is active.
+		if ( YoastAdapter::is_active() ) {
+			add_settings_section(
+				'vaani_seo',
+				__( 'SEO', 'vaani' ),
+				'__return_false',
+				self::PAGE_SLUG
+			);
+
+			add_settings_field(
+				'translate_yoast',
+				__( 'Yoast SEO meta', 'vaani' ),
+				array( $this, 'render_translate_yoast_field' ),
+				self::PAGE_SLUG,
+				'vaani_seo'
+			);
+		}
 	}
 
 	/**
@@ -380,6 +399,19 @@ class SettingsPage {
 			esc_html__( 'Convert to a natural spoken form (expands symbols and numbers into spoken words)', 'vaani' )
 		);
 		echo '<p class="description">' . esc_html__( 'Leave off for faithful script-only conversion of written content.', 'vaani' ) . '</p>';
+	}
+
+	/**
+	 * Render the "translate Yoast SEO meta" checkbox (SEO section).
+	 */
+	public function render_translate_yoast_field(): void {
+		printf(
+			'<label><input type="checkbox" id="vaani_translate_yoast" name="%1$s[translate_yoast]" value="1" %2$s /> %3$s</label>',
+			esc_attr( Settings::OPTION_NAME ),
+			checked( $this->settings->get_translate_yoast(), true, false ),
+			esc_html__( 'Translate the Yoast SEO title and description when translating content', 'vaani' )
+		);
+		echo '<p class="description">' . esc_html__( 'Translates manually-set Yoast SEO title, meta description, and social (OG/Twitter) fields. Adds Sarvam usage per language.', 'vaani' ) . '</p>';
 	}
 
 	/**

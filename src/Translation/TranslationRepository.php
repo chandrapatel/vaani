@@ -98,11 +98,45 @@ class TranslationRepository {
 	}
 
 	/**
+	 * Every translation linked to a source post, regardless of status.
+	 *
+	 * Used by cleanup when the source is trashed/deleted (CLAUDE.md §6).
+	 *
+	 * @return WP_Post[]
+	 */
+	public function find_all_for_source( int $source_id ): array {
+		$query = new \WP_Query(
+			array(
+				'post_type'              => TranslationPostType::POST_TYPE,
+				'post_status'            => 'any',
+				'posts_per_page'         => -1,
+				'no_found_rows'          => true,
+				'update_post_term_cache' => false,
+				'ignore_sticky_posts'    => true,
+				'meta_query'             => array(
+					array(
+						'key'   => TranslationPostType::META_SOURCE_ID,
+						'value' => $source_id,
+					),
+				),
+			)
+		);
+
+		return array_filter(
+			$query->posts,
+			static function ( $post ): bool {
+				return $post instanceof WP_Post;
+			}
+		);
+	}
+
+	/**
 	 * Create a translation post linked to a source.
 	 *
 	 * @param array<string, mixed> $data {
 	 *     @type string $title        Post title.
 	 *     @type string $content      Translated post_content.
+	 *     @type string $excerpt      Translated post_excerpt.
 	 *     @type string $status       wp post_status (default 'draft').
 	 *     @type string $source_hash  Source content hash at translation time.
 	 *     @type string $vaani_status Lifecycle status (pending|completed|failed).
@@ -117,6 +151,7 @@ class TranslationRepository {
 				'post_status'  => $data['status'] ?? 'draft',
 				'post_title'   => $data['title'] ?? '',
 				'post_content' => $data['content'] ?? '',
+				'post_excerpt' => $data['excerpt'] ?? '',
 			),
 			true
 		);
@@ -145,6 +180,7 @@ class TranslationRepository {
 				'post_status'  => $data['status'] ?? 'draft',
 				'post_title'   => $data['title'] ?? '',
 				'post_content' => $data['content'] ?? '',
+				'post_excerpt' => $data['excerpt'] ?? '',
 			)
 		);
 
@@ -158,6 +194,26 @@ class TranslationRepository {
 	 */
 	public function set_status( int $post_id, string $vaani_status ): void {
 		update_post_meta( $post_id, TranslationPostType::META_STATUS, $vaani_status );
+
+		// Status changes alter renderability but bypass save_post, so signal
+		// listeners (e.g. the front-end cache) explicitly.
+		$source_id = (int) get_post_meta( $post_id, TranslationPostType::META_SOURCE_ID, true );
+		if ( $source_id > 0 ) {
+			/**
+			 * Fires when a translation's renderability may have changed via a
+			 * meta-only write (no save_post).
+			 *
+			 * @param int $source_id Source post ID.
+			 */
+			do_action( 'vaani_translation_changed', $source_id );
+		}
+	}
+
+	/**
+	 * Record the error message from a failed translation job.
+	 */
+	public function set_error( int $post_id, string $message ): void {
+		update_post_meta( $post_id, TranslationPostType::META_ERROR, $message );
 	}
 
 	/**
@@ -168,6 +224,11 @@ class TranslationRepository {
 	private function apply_meta( int $post_id, array $data ): void {
 		if ( isset( $data['vaani_status'] ) ) {
 			update_post_meta( $post_id, TranslationPostType::META_STATUS, (string) $data['vaani_status'] );
+
+			// A completed run supersedes any earlier failure message.
+			if ( TranslationPostType::STATUS_COMPLETED === $data['vaani_status'] ) {
+				delete_post_meta( $post_id, TranslationPostType::META_ERROR );
+			}
 		}
 
 		if ( isset( $data['source_hash'] ) ) {

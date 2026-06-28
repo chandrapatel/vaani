@@ -15,6 +15,7 @@ use Vaani\Core\Language\Registry;
 use Vaani\Core\Queue;
 use Vaani\Core\Sarvam\Client;
 use Vaani\Core\Settings;
+use Vaani\Seo\YoastAdapter;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -120,10 +121,14 @@ class TranslationService {
 
 			$content = $translator->translate( $source->post_content, $source_code, $target_code );
 			$title   = $translator->translate_string( $source->post_title, $source_code, $target_code );
+			$excerpt = '' !== trim( (string) $source->post_excerpt )
+				? $translator->translate_string( $source->post_excerpt, $source_code, $target_code )
+				: '';
 
 			$payload = array(
 				'title'        => $title,
 				'content'      => $content,
+				'excerpt'      => $excerpt,
 				'status'       => 'publish',
 				'vaani_status' => TranslationPostType::STATUS_COMPLETED,
 				'source_hash'  => Hash::of( $source->post_content ),
@@ -133,10 +138,13 @@ class TranslationService {
 			$existing = $this->repository->find( $source_id, $lang );
 
 			if ( $existing ) {
-				$this->repository->update( $existing->ID, $payload );
+				$translation_id = (int) $existing->ID;
+				$this->repository->update( $translation_id, $payload );
 			} else {
-				$this->repository->create( $source_id, $lang, $payload );
+				$translation_id = $this->repository->create( $source_id, $lang, $payload );
 			}
+
+			$this->maybe_translate_yoast( $source_id, $translation_id, $translator, $source_code, $target_code );
 
 			/**
 			 * Fires after a successful Sarvam API operation, for usage logging.
@@ -154,10 +162,31 @@ class TranslationService {
 			$existing = $this->repository->find( $source_id, $lang );
 			if ( $existing ) {
 				$this->repository->set_status( $existing->ID, TranslationPostType::STATUS_FAILED );
+				$this->repository->set_error( $existing->ID, $e->getMessage() );
 			}
 		} finally {
 			delete_transient( $lock );
 		}
+	}
+
+	/**
+	 * Translate the source post's Yoast SEO fields onto the translation, when the
+	 * setting is on and Yoast is active (CLAUDE.md §6, seam #6).
+	 *
+	 * Only manually-set fields are translated; the per-call usage logging already
+	 * covers the extra Sarvam requests.
+	 */
+	private function maybe_translate_yoast( int $source_id, int $translation_id, BlockTranslator $translator, string $source_code, string $target_code ): void {
+		if ( 0 === $translation_id || ! $this->settings->get_translate_yoast() || ! YoastAdapter::is_active() ) {
+			return;
+		}
+
+		$translated = array();
+		foreach ( YoastAdapter::read_source( $source_id ) as $meta_key => $value ) {
+			$translated[ $meta_key ] = $translator->translate_string( $value, $source_code, $target_code );
+		}
+
+		YoastAdapter::store( $translation_id, $translated );
 	}
 
 	/**
@@ -179,6 +208,7 @@ class TranslationService {
 			array(
 				'title'        => $source ? $source->post_title : '',
 				'content'      => '',
+				'excerpt'      => $source ? $source->post_excerpt : '',
 				'status'       => 'draft',
 				'vaani_status' => TranslationPostType::STATUS_PENDING,
 				'slug'         => $source ? $source->post_name : '',

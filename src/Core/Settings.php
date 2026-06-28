@@ -54,6 +54,7 @@ class Settings {
 			'translate_model'               => Client::DEFAULT_MODEL,
 			'translate_mode'                => 'formal',
 			'translate_gender'              => 'Male',
+			'translate_yoast'               => false,
 			'transliterate_numerals_format' => 'native',
 			'transliterate_spoken_form'     => false,
 			'transliterate_spoken_numerals' => 'native',
@@ -175,6 +176,13 @@ class Settings {
 	}
 
 	/**
+	 * Whether to translate Yoast SEO meta alongside content (when Yoast is active).
+	 */
+	public function get_translate_yoast(): bool {
+		return (bool) $this->all()['translate_yoast'];
+	}
+
+	/**
 	 * Translation config for {@see Client}, with model-appropriate values.
 	 *
 	 * @return array<string, mixed>
@@ -269,6 +277,8 @@ class Settings {
 		$gender = isset( $input['translate_gender'] ) ? sanitize_text_field( (string) $input['translate_gender'] ) : $defaults['translate_gender'];
 		$gender = in_array( $gender, Client::SPEAKER_GENDERS, true ) ? $gender : $defaults['translate_gender'];
 
+		$translate_yoast = ! empty( $input['translate_yoast'] );
+
 		$audio_model = isset( $input['audio_model'] ) ? sanitize_text_field( (string) $input['audio_model'] ) : $defaults['audio_model'];
 		$audio_model = isset( Client::TTS_MODELS[ $audio_model ] ) ? $audio_model : $defaults['audio_model'];
 
@@ -287,6 +297,7 @@ class Settings {
 			'translate_model'               => $model,
 			'translate_mode'                => $mode,
 			'translate_gender'              => $gender,
+			'translate_yoast'               => $translate_yoast,
 			'transliterate_numerals_format' => $numerals_format,
 			'transliterate_spoken_form'     => $spoken_form,
 			'transliterate_spoken_numerals' => $spoken_numerals,

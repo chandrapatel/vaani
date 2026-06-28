@@ -184,7 +184,15 @@ class TranslationMetaBox {
 				$html = '<span class="vaani-state">' . esc_html__( 'Queued…', 'vaani' ) . '</span>';
 				break;
 			case TranslationPostType::STATUS_FAILED:
-				$html = '<span class="vaani-state" style="color:#b32d2e;">' . esc_html__( 'Failed', 'vaani' ) . '</span>';
+				$error = (string) get_post_meta( $translation->ID, TranslationPostType::META_ERROR, true );
+				$html  = sprintf(
+					'<span class="vaani-state" style="color:#b32d2e;"%s>%s</span>',
+					'' !== $error ? ' title="' . esc_attr( $error ) . '"' : '',
+					esc_html__( 'Failed', 'vaani' )
+				);
+				if ( '' !== $error ) {
+					$html .= '<br><span class="description" style="color:#b32d2e;">' . esc_html( $error ) . '</span>';
+				}
 				break;
 			case TranslationPostType::STATUS_COMPLETED:
 				$html = '<span class="vaani-state">' . esc_html__( 'Translated', 'vaani' ) . '</span>';
