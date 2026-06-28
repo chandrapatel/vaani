@@ -16,6 +16,7 @@ use Vaani\Translation\Admin\LanguagePanel;
 use Vaani\Translation\TranslationPostType;
 use Vaani\Translation\TranslationRepository;
 use Vaani\Translation\TranslationService;
+use Vaani\Usage\UsageRepository;
 use WP_Post;
 
 defined( 'ABSPATH' ) || exit;
@@ -33,14 +34,16 @@ class TranslationMetaBox {
 	private const AJAX_ACTION = 'vaani_translate';
 
 	/**
-	 * @param Settings              $settings   Settings accessor.
-	 * @param TranslationRepository $repository Translation storage.
-	 * @param TranslationService    $service    Translation orchestration.
+	 * @param Settings              $settings        Settings accessor.
+	 * @param TranslationRepository $repository      Translation storage.
+	 * @param TranslationService    $service         Translation orchestration.
+	 * @param UsageRepository       $usageRepository Usage log, for per-post cost.
 	 */
 	public function __construct(
 		private Settings $settings,
 		private TranslationRepository $repository,
-		private TranslationService $service
+		private TranslationService $service,
+		private UsageRepository $usageRepository
 	) {}
 
 	/**
@@ -110,6 +113,35 @@ class TranslationMetaBox {
 			);
 		}
 		echo '</tbody></table>';
+
+		$this->render_cost_estimate( $post->ID );
+	}
+
+	/**
+	 * One-line all-time Sarvam cost estimate for this post (Phase 5).
+	 *
+	 * Read-only attribution — the part Sarvam's own dashboard can't show. The
+	 * figure is an estimate; the full disclaimer + links live on the dashboard
+	 * widget.
+	 */
+	private function render_cost_estimate( int $source_id ): void {
+		$usage = $this->usageRepository->source_summary( $source_id );
+
+		if ( 0 === $usage['operations'] ) {
+			return;
+		}
+
+		printf(
+			'<p class="description">%s</p>',
+			esc_html(
+				sprintf(
+					/* translators: 1: estimated rupee amount, 2: character count. */
+					__( 'This post: ~₹%1$s estimated · %2$s characters sent to Sarvam.', 'vaani' ),
+					number_format_i18n( $usage['cost'], 2 ),
+					number_format_i18n( $usage['units'] )
+				)
+			)
+		);
 	}
 
 	/**

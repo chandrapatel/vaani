@@ -35,4 +35,9 @@ return array(
     'Vaani\\Translation\\TranslationPostType' => $baseDir . '/src/Translation/TranslationPostType.php',
     'Vaani\\Translation\\TranslationRepository' => $baseDir . '/src/Translation/TranslationRepository.php',
     'Vaani\\Translation\\TranslationService' => $baseDir . '/src/Translation/TranslationService.php',
+    'Vaani\\Usage\\Admin\\UsageDashboardWidget' => $baseDir . '/src/Usage/Admin/UsageDashboardWidget.php',
+    'Vaani\\Usage\\Pricing' => $baseDir . '/src/Usage/Pricing.php',
+    'Vaani\\Usage\\UsageLogger' => $baseDir . '/src/Usage/UsageLogger.php',
+    'Vaani\\Usage\\UsageRepository' => $baseDir . '/src/Usage/UsageRepository.php',
+    'Vaani\\Usage\\UsageTable' => $baseDir . '/src/Usage/UsageTable.php',
 );

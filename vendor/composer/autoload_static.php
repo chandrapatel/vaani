@@ -50,6 +50,11 @@ class ComposerStaticInit253c4afa292eab6dca564ebbab580d71
         'Vaani\\Translation\\TranslationPostType' => __DIR__ . '/../..' . '/src/Translation/TranslationPostType.php',
         'Vaani\\Translation\\TranslationRepository' => __DIR__ . '/../..' . '/src/Translation/TranslationRepository.php',
         'Vaani\\Translation\\TranslationService' => __DIR__ . '/../..' . '/src/Translation/TranslationService.php',
+        'Vaani\\Usage\\Admin\\UsageDashboardWidget' => __DIR__ . '/../..' . '/src/Usage/Admin/UsageDashboardWidget.php',
+        'Vaani\\Usage\\Pricing' => __DIR__ . '/../..' . '/src/Usage/Pricing.php',
+        'Vaani\\Usage\\UsageLogger' => __DIR__ . '/../..' . '/src/Usage/UsageLogger.php',
+        'Vaani\\Usage\\UsageRepository' => __DIR__ . '/../..' . '/src/Usage/UsageRepository.php',
+        'Vaani\\Usage\\UsageTable' => __DIR__ . '/../..' . '/src/Usage/UsageTable.php',
     );
 
     public static function getInitializer(ClassLoader $loader)

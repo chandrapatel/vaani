@@ -10,6 +10,7 @@ declare( strict_types=1 );
 namespace Vaani;
 
 use Vaani\Frontend\Router;
+use Vaani\Usage\UsageTable;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -28,5 +29,7 @@ class Activator {
 	public static function activate(): void {
 		Router::add_rewrite_rules();
 		flush_rewrite_rules();
+
+		UsageTable::create();
 	}
 }

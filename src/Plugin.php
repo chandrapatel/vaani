@@ -27,6 +27,10 @@ use Vaani\Translation\Admin\TranslationMetaBox;
 use Vaani\Translation\TranslationPostType;
 use Vaani\Translation\TranslationRepository;
 use Vaani\Translation\TranslationService;
+use Vaani\Usage\Admin\UsageDashboardWidget;
+use Vaani\Usage\UsageLogger;
+use Vaani\Usage\UsageRepository;
+use Vaani\Usage\UsageTable;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -46,6 +50,12 @@ class Plugin {
 		( new SettingsPage( $settings ) )->register();
 		( new LanguagePanel( $settings ) )->register();
 
+		// Usage & billing (Phase 5).
+		$usage_repo = new UsageRepository();
+		( new UsageLogger( $usage_repo ) )->register();
+		( new UsageDashboardWidget( $usage_repo ) )->register();
+		add_action( 'admin_init', array( UsageTable::class, 'maybe_upgrade' ) );
+
 		// Translation engine (Phase 2).
 		( new TranslationPostType() )->register();
 
@@ -53,7 +63,7 @@ class Plugin {
 		$service    = new TranslationService( $repository, new Queue(), $settings );
 		$service->register();
 
-		( new TranslationMetaBox( $settings, $repository, $service ) )->register();
+		( new TranslationMetaBox( $settings, $repository, $service, $usage_repo ) )->register();
 
 		// Front-end rendering, URLs & SEO (Phase 3).
 		$available = new AvailableTranslations( $repository );
