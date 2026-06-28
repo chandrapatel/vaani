@@ -12,6 +12,17 @@ This is **not** a locale-first multilingual solution (WPML/Polylang). The site i
 English — navigation, archives, and the default experience are English — and a reader chooses
 to read *a specific post* in, say, Tamil. Language selection is per-post, not sticky.
 
+## Project status
+
+Vaani is a young, experimental project. It works well for typical block-editor posts and pages,
+but it hasn't been exhaustively tested across every kind of blog content, block, and theme yet —
+so try it on a staging site or a few posts first and review the results before rolling it out
+widely. Your original posts and pages are never modified, so it's safe to experiment.
+
+Bug reports and feedback are very welcome — please [open an issue](https://github.com/chandrapatel/vaani/issues).
+This is an experimental side project with no guaranteed maintenance schedule, so responses and
+fixes may be delayed — but every report genuinely helps and is appreciated.
+
 ## Requirements
 
 - WordPress 6.4+
@@ -62,18 +73,37 @@ translations are not auto-regenerated.
 
 In the **Audio** section of the **Vaani** sidebar, click **Generate** for a language to
 synthesize an MP3 via Sarvam TTS. It runs in the background and is stored in the media library;
-click **Refresh** to pull the result. Readers get a **Listen** player on the translated page.
+click **Refresh** to pull the result.
+
+To show a "Listen" player, add the **Vaani Audio Player** block to your **original** post where
+you want it (it's also available as an opt-in `the_content` prepend). You add it once on the
+original; it renders automatically on each language version, playing that page's audio at the same
+position. See [Placing the switcher & audio blocks](#placing-the-switcher--audio-blocks).
 
 ### Reading translations (front end)
 
 - Published translations are served at clean **path-prefixed URLs** — e.g. `/hi/about/` for the
   Hindi version of `/about/`. The original post is never altered.
-- A **language switcher** (block or widget) links to the languages a post is available in.
-  Selection is per-post: switching applies to the current post only, not the whole site.
+- A **language switcher** (the **Vaani Language Switcher** block, or a widget of the same name)
+  links to the languages a post is available in. Selection is per-post: switching applies to the
+  current post only, not the whole site.
 - **`hreflang`** alternate tags are emitted for search engines, with `x-default` on the original.
 - **SEO meta (optional):** when Yoast SEO is active, enable *Settings → Vaani → SEO →
   Yoast SEO meta* to translate the Yoast title, meta description, and social (OG/Twitter) fields
   alongside content.
+
+#### Placing the switcher & audio blocks
+
+The **Vaani Language Switcher** and **Vaani Audio Player** are added to your **original** English
+post in the block editor, wherever you want them to appear. They are dynamic, language-aware
+blocks: each one renders the current page's language automatically, so you place a block **once on
+the original** and it shows up at the same position on every language version — `/`, `/hi/`,
+`/gu/`, and so on.
+
+Because the original is the single source of truth for these blocks, adding, moving, or removing
+one updates all languages immediately — **no need to re-translate**, and your reviewed translation
+edits are never touched. (Prefer not to use blocks? A **Vaani Language Switcher** widget and opt-in
+`the_content` filters — `vaani_append_switcher` / `vaani_append_audio_player` — are available too.)
 
 ### Usage & cost
 
