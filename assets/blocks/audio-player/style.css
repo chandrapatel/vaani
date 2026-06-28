@@ -1,0 +1,29 @@
+/**
+ * Vaani — Audio Player (front-end).
+ */
+.vaani-audio-player {
+	margin: 0 0 1.5em;
+	padding: 0.75em 1em;
+	border: 1px solid rgba( 0, 0, 0, 0.1 );
+	border-radius: 6px;
+}
+
+.vaani-audio-player__title {
+	margin: 0 0 0.5em;
+	font-weight: 600;
+}
+
+.vaani-audio-player__lang {
+	font-weight: 400;
+	opacity: 0.7;
+}
+
+.vaani-audio-player__audio {
+	display: block;
+	width: 100%;
+}
+
+.vaani-audio-player--placeholder {
+	opacity: 0.7;
+	font-style: italic;
+}

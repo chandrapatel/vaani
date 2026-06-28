@@ -166,6 +166,40 @@ class SettingsPage {
 				'class'     => 'vaani-row-mayura',
 			)
 		);
+
+		add_settings_section(
+			'vaani_audio',
+			__( 'Audio', 'vaani' ),
+			'__return_false',
+			self::PAGE_SLUG
+		);
+
+		add_settings_field(
+			'audio_model',
+			__( 'Model', 'vaani' ),
+			array( $this, 'render_audio_model_field' ),
+			self::PAGE_SLUG,
+			'vaani_audio',
+			array( 'label_for' => 'vaani_audio_model' )
+		);
+
+		add_settings_field(
+			'audio_speaker',
+			__( 'Voice', 'vaani' ),
+			array( $this, 'render_audio_speaker_field' ),
+			self::PAGE_SLUG,
+			'vaani_audio',
+			array( 'label_for' => 'vaani_audio_speaker' )
+		);
+
+		add_settings_field(
+			'audio_pace',
+			__( 'Pace', 'vaani' ),
+			array( $this, 'render_audio_pace_field' ),
+			self::PAGE_SLUG,
+			'vaani_audio',
+			array( 'label_for' => 'vaani_audio_pace' )
+		);
 	}
 
 	/**
@@ -325,6 +359,73 @@ class SettingsPage {
 		}
 		echo '</select>';
 		echo '<p class="description">' . esc_html__( 'Helps keep first-person verb forms consistent across the translation.', 'vaani' ) . '</p>';
+	}
+
+	/**
+	 * Render the text-to-speech model select.
+	 */
+	public function render_audio_model_field(): void {
+		$current = $this->settings->get_audio_model();
+		$labels  = array(
+			'bulbul:v3' => __( 'Bulbul v3 — latest, up to 2500 chars/request', 'vaani' ),
+			'bulbul:v2' => __( 'Bulbul v2 — up to 1500 chars/request', 'vaani' ),
+		);
+
+		printf( '<select id="vaani_audio_model" name="%s[audio_model]">', esc_attr( Settings::OPTION_NAME ) );
+		foreach ( Client::TTS_MODELS as $model => $caps ) {
+			printf(
+				'<option value="%1$s" %2$s>%3$s</option>',
+				esc_attr( $model ),
+				selected( $current, $model, false ),
+				esc_html( $labels[ $model ] ?? $model )
+			);
+		}
+		echo '</select>';
+	}
+
+	/**
+	 * Render the TTS voice select.
+	 *
+	 * Voices are model-specific, so they are grouped by model. "Automatic" uses
+	 * the selected model's default voice; a voice that doesn't match the chosen
+	 * model also falls back to that default at request time.
+	 */
+	public function render_audio_speaker_field(): void {
+		$current = $this->settings->get_audio_speaker();
+
+		printf( '<select id="vaani_audio_speaker" name="%s[audio_speaker]">', esc_attr( Settings::OPTION_NAME ) );
+		printf(
+			'<option value="" %1$s>%2$s</option>',
+			selected( $current, '', false ),
+			esc_html__( 'Automatic (model default)', 'vaani' )
+		);
+
+		foreach ( Client::TTS_MODELS as $model => $caps ) {
+			printf( '<optgroup label="%s">', esc_attr( $model ) );
+			foreach ( $caps['speakers'] as $speaker ) {
+				printf(
+					'<option value="%1$s" %2$s>%3$s</option>',
+					esc_attr( $speaker ),
+					selected( $current, $speaker, false ),
+					esc_html( ucfirst( $speaker ) )
+				);
+			}
+			echo '</optgroup>';
+		}
+		echo '</select>';
+		echo '<p class="description">' . esc_html__( 'Pick a voice that belongs to the selected model.', 'vaani' ) . '</p>';
+	}
+
+	/**
+	 * Render the TTS pace field.
+	 */
+	public function render_audio_pace_field(): void {
+		printf(
+			'<input type="number" id="vaani_audio_pace" name="%1$s[audio_pace]" value="%2$s" min="0.5" max="2" step="0.1" class="small-text" />',
+			esc_attr( Settings::OPTION_NAME ),
+			esc_attr( (string) $this->settings->get_audio_pace() )
+		);
+		echo '<p class="description">' . esc_html__( 'Speaking speed from 0.5 (slow) to 2.0 (fast); 1.0 is normal.', 'vaani' ) . '</p>';
 	}
 
 	/**

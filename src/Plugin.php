@@ -10,9 +10,13 @@ declare( strict_types=1 );
 namespace Vaani;
 
 use Vaani\Admin\SettingsPage;
+use Vaani\Audio\Admin\AudioMetaBox;
+use Vaani\Audio\AudioRepository;
+use Vaani\Audio\AudioService;
 use Vaani\Core\Crypto;
 use Vaani\Core\Queue;
 use Vaani\Core\Settings;
+use Vaani\Frontend\AudioPlayer;
 use Vaani\Frontend\AvailableTranslations;
 use Vaani\Frontend\ContentRenderer;
 use Vaani\Frontend\LanguageSwitcher;
@@ -58,6 +62,14 @@ class Plugin {
 		( new ContentRenderer( $available ) )->register();
 		( new LanguageSwitcher( $available, $settings ) )->register();
 		( new Hreflang( $available, $settings ) )->register();
+
+		// Audio generation (Phase 4).
+		$audio_repo    = new AudioRepository();
+		$audio_service = new AudioService( $audio_repo, $repository, new Queue(), $settings );
+		$audio_service->register();
+
+		( new AudioMetaBox( $settings, $available, $audio_repo, $audio_service ) )->register();
+		( new AudioPlayer( $audio_repo, $settings ) )->register();
 	}
 
 	/**

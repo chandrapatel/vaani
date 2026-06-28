@@ -53,6 +53,9 @@ class Settings {
 			'translate_model'  => Client::DEFAULT_MODEL,
 			'translate_mode'   => 'formal',
 			'translate_gender' => 'Male',
+			'audio_model'      => Client::DEFAULT_TTS_MODEL,
+			'audio_speaker'    => '',
+			'audio_pace'       => 1.0,
 		);
 	}
 
@@ -147,6 +150,42 @@ class Settings {
 	}
 
 	/**
+	 * Selected text-to-speech model (e.g. `bulbul:v3`).
+	 */
+	public function get_audio_model(): string {
+		$model = (string) $this->all()['audio_model'];
+
+		return isset( Client::TTS_MODELS[ $model ] ) ? $model : Client::DEFAULT_TTS_MODEL;
+	}
+
+	/**
+	 * Selected TTS speaker, or '' to use the model's default voice.
+	 */
+	public function get_audio_speaker(): string {
+		return (string) $this->all()['audio_speaker'];
+	}
+
+	/**
+	 * Selected TTS speaking pace (0.5–2.0).
+	 */
+	public function get_audio_pace(): float {
+		return (float) $this->all()['audio_pace'];
+	}
+
+	/**
+	 * Audio config for {@see Client}.
+	 *
+	 * @return array<string, mixed>
+	 */
+	public function get_audio_config(): array {
+		return array(
+			'tts_model'   => $this->get_audio_model(),
+			'tts_speaker' => $this->get_audio_speaker(),
+			'tts_pace'    => $this->get_audio_pace(),
+		);
+	}
+
+	/**
 	 * Sanitize callback for the Settings API.
 	 *
 	 * @param mixed $input Raw submitted value.
@@ -177,6 +216,15 @@ class Settings {
 		$gender = isset( $input['translate_gender'] ) ? sanitize_text_field( (string) $input['translate_gender'] ) : $defaults['translate_gender'];
 		$gender = in_array( $gender, Client::SPEAKER_GENDERS, true ) ? $gender : $defaults['translate_gender'];
 
+		$audio_model = isset( $input['audio_model'] ) ? sanitize_text_field( (string) $input['audio_model'] ) : $defaults['audio_model'];
+		$audio_model = isset( Client::TTS_MODELS[ $audio_model ] ) ? $audio_model : $defaults['audio_model'];
+
+		$audio_speaker = isset( $input['audio_speaker'] ) ? sanitize_key( (string) $input['audio_speaker'] ) : '';
+		$audio_speaker = in_array( $audio_speaker, self::tts_speaker_choices(), true ) ? $audio_speaker : '';
+
+		$audio_pace = isset( $input['audio_pace'] ) ? (float) $input['audio_pace'] : (float) $defaults['audio_pace'];
+		$audio_pace = max( 0.5, min( 2.0, $audio_pace ) );
+
 		return array(
 			'api_key'          => $api_key,
 			'source_lang'      => $source_lang,
@@ -185,7 +233,26 @@ class Settings {
 			'translate_model'  => $model,
 			'translate_mode'   => $mode,
 			'translate_gender' => $gender,
+			'audio_model'      => $audio_model,
+			'audio_speaker'    => $audio_speaker,
+			'audio_pace'       => $audio_pace,
 		);
+	}
+
+	/**
+	 * Every selectable TTS speaker across all models (the empty string — meaning
+	 * "model default" — is handled separately by the caller).
+	 *
+	 * @return string[]
+	 */
+	public static function tts_speaker_choices(): array {
+		$speakers = array();
+
+		foreach ( Client::TTS_MODELS as $caps ) {
+			$speakers = array_merge( $speakers, $caps['speakers'] );
+		}
+
+		return array_values( array_unique( $speakers ) );
 	}
 
 	/**

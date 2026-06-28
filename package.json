@@ -14,7 +14,8 @@
 		"entry": {
 			"admin-settings": "assets/js/admin-settings.js",
 			"editor-language-panel": "assets/js/editor-language-panel.js",
-			"translation-metabox": "assets/js/translation-metabox.js"
+			"translation-metabox": "assets/js/translation-metabox.js",
+			"audio-metabox": "assets/js/audio-metabox.js"
 		}
 	},
 	"scripts": {

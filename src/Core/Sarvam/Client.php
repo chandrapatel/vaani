@@ -73,6 +73,35 @@ class Client {
 	public const SPEAKER_GENDERS = array( 'Male', 'Female' );
 
 	/**
+	 * Text-to-speech (Bulbul) models, their per-request character caps, and the
+	 * named voices each one accepts.
+	 *
+	 * Speaker names are model-specific: a `bulbul:v2` voice is rejected by
+	 * `bulbul:v3` and vice versa, so {@see self::tts_speaker()} validates the
+	 * configured speaker against the active model and falls back to that model's
+	 * default. Lists are curated subsets of Sarvam's catalogue (docs.sarvam.ai).
+	 *
+	 * @var array<string, array{max_chars: int, default_speaker: string, speakers: string[]}>
+	 */
+	public const TTS_MODELS = array(
+		'bulbul:v3' => array(
+			'max_chars'       => 2500,
+			'default_speaker' => 'shubh',
+			'speakers'        => array( 'shubh', 'aditya', 'rahul', 'rohan', 'kavya', 'priya', 'neha', 'pooja', 'simran', 'ritu' ),
+		),
+		'bulbul:v2' => array(
+			'max_chars'       => 1500,
+			'default_speaker' => 'anushka',
+			'speakers'        => array( 'anushka', 'manisha', 'vidya', 'arya', 'abhilash', 'karun', 'hitesh' ),
+		),
+	);
+
+	/**
+	 * Default text-to-speech model.
+	 */
+	public const DEFAULT_TTS_MODEL = 'bulbul:v3';
+
+	/**
 	 * Number of retry attempts on transient failures (429 / 5xx).
 	 */
 	private const MAX_RETRIES = 2;
@@ -98,9 +127,26 @@ class Client {
 	private string $speaker_gender;
 
 	/**
+	 * Text-to-speech model in use.
+	 */
+	private string $tts_model;
+
+	/**
+	 * Configured TTS speaker, or '' to use the model's default voice.
+	 */
+	private string $tts_speaker;
+
+	/**
+	 * TTS speaking pace (0.5–2.0; 1.0 = normal).
+	 */
+	private float $tts_pace;
+
+	/**
 	 * @param string               $api_key Sarvam API key.
-	 * @param array<string, string> $config  Optional translation config:
+	 * @param array<string, mixed> $config  Optional config. Translation keys:
 	 *                                        `model`, `mode`, `speaker_gender`.
+	 *                                        Audio keys: `tts_model`, `tts_speaker`,
+	 *                                        `tts_pace`.
 	 */
 	public function __construct( string $api_key, array $config = array() ) {
 		$this->api_key = $api_key;
@@ -109,6 +155,11 @@ class Client {
 		$this->model   = isset( self::TRANSLATE_MODELS[ $model ] ) ? $model : self::DEFAULT_MODEL;
 		$this->mode    = $config['mode'] ?? 'formal';
 		$this->speaker_gender = $config['speaker_gender'] ?? '';
+
+		$tts_model       = $config['tts_model'] ?? self::DEFAULT_TTS_MODEL;
+		$this->tts_model = isset( self::TTS_MODELS[ $tts_model ] ) ? $tts_model : self::DEFAULT_TTS_MODEL;
+		$this->tts_speaker = (string) ( $config['tts_speaker'] ?? '' );
+		$this->tts_pace    = $this->clamp_pace( (float) ( $config['tts_pace'] ?? 1.0 ) );
 	}
 
 	/**
@@ -116,6 +167,13 @@ class Client {
 	 */
 	public function max_input_chars(): int {
 		return self::TRANSLATE_MODELS[ $this->model ]['max_chars'];
+	}
+
+	/**
+	 * Max input characters per text-to-speech request for the configured model.
+	 */
+	public function tts_max_input_chars(): int {
+		return self::TTS_MODELS[ $this->tts_model ]['max_chars'];
 	}
 
 	/**
@@ -248,6 +306,81 @@ class Client {
 		}
 
 		return $body;
+	}
+
+	/**
+	 * Synthesise speech for a single chunk of plain text.
+	 *
+	 * Operates on one chunk at a time; the caller keeps `$text` within
+	 * {@see self::tts_max_input_chars()} and concatenates the resulting audio
+	 * across chunks. Requests MP3 directly (`output_audio_codec`), so no codec
+	 * conversion is needed.
+	 *
+	 * @param string $text        Plain text to speak.
+	 * @param string $target_code Sarvam language code (e.g. `hi-IN`).
+	 * @return Response On success, {@see Response::text()} holds the **base64-encoded**
+	 *                  MP3 audio and {@see Response::units()} the character count.
+	 */
+	public function text_to_speech( string $text, string $target_code ): Response {
+		if ( '' === trim( $this->api_key ) ) {
+			return Response::failure( __( 'No API key set.', 'vaani' ) );
+		}
+
+		if ( '' === trim( $text ) ) {
+			return Response::failure( __( 'Nothing to convert to speech.', 'vaani' ) );
+		}
+
+		$response = $this->request( '/text-to-speech', $this->tts_body( $text, $target_code ) );
+
+		if ( is_wp_error( $response ) ) {
+			return Response::failure( $response->get_error_message() );
+		}
+
+		$code = (int) wp_remote_retrieve_response_code( $response );
+		$body = json_decode( (string) wp_remote_retrieve_body( $response ), true );
+
+		if ( $code < 200 || $code >= 300 || ! is_array( $body ) || empty( $body['audios'][0] ) || ! is_string( $body['audios'][0] ) ) {
+			return Response::failure( $this->error_message( $code, $body ) );
+		}
+
+		return Response::success( $body['audios'][0], (int) mb_strlen( $text ) );
+	}
+
+	/**
+	 * Build the /text-to-speech request body.
+	 *
+	 * @return array<string, mixed>
+	 */
+	private function tts_body( string $text, string $target_code ): array {
+		return array(
+			'model'                => $this->tts_model,
+			'text'                 => $text,
+			'target_language_code' => $target_code,
+			'speaker'              => $this->tts_speaker(),
+			'output_audio_codec'   => 'mp3',
+			'pace'                 => $this->tts_pace,
+		);
+	}
+
+	/**
+	 * The voice to request: the configured speaker when valid for the active
+	 * model, otherwise that model's default.
+	 */
+	private function tts_speaker(): string {
+		$capabilities = self::TTS_MODELS[ $this->tts_model ];
+
+		if ( '' !== $this->tts_speaker && in_array( $this->tts_speaker, $capabilities['speakers'], true ) ) {
+			return $this->tts_speaker;
+		}
+
+		return $capabilities['default_speaker'];
+	}
+
+	/**
+	 * Constrain pace to Sarvam's accepted 0.5–2.0 range.
+	 */
+	private function clamp_pace( float $pace ): float {
+		return max( 0.5, min( 2.0, $pace ) );
 	}
 
 	/**
